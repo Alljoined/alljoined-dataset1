@@ -1,8 +1,16 @@
+# Converts the hdf5 file of all images we downloaded from pscotti into a .mat file
+# Originally in float, convert to int range 0-255. Also selecting specific index for testing
+
 import h5py
 import numpy as np
-from scipy.io import savemat
+from scipy.io import savemat, loadmat
 
 file_path = r"C:\Users\jonat\Documents\coding\matlab_preprocessing\datasets--pscotti--mindeyev2\snapshots\2996c8186484bce80304442676ffeb351d35a62d\coco_images_224_float16.hdf5"
+label_path = r"C:\Users\jonat\Documents\coding\matlab_preprocessing\stimulus\nsd_expdesign.mat"
+
+# Get image indexes
+mat_contents = loadmat(label_path)
+select_idx = mat_contents['sharedix'][0]
 
 # Load HDF5 file
 with h5py.File(file_path, 'r') as file:
@@ -10,7 +18,7 @@ with h5py.File(file_path, 'r') as file:
 
 # Prepare the data for saving in .MAT format
 # MATLAB prefers dictionaries
-subset = images[:100]
+subset = images[select_idx]
 subset = (subset * 255).astype(np.uint8)
 num_images = len(subset)
 

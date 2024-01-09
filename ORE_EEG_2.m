@@ -22,7 +22,7 @@ NIMAGES = 100;
 % setup trial and block parameters 
 DISPLAY_TIME = 0.3; % the time the stimulus is displayed on screen 
 BLANK_TIME = 0.3; % the minimum blank time 
-BLANK_BUFFER = 0.1; % the temporal jitter that may be added to the blank time
+BLANK_BUFFER = 0.05; % the temporal jitter that may be added to the blank time
 CUE_TIME = 0.1; % the time the cue is presented on screen
 
 % setup trigger information
@@ -54,8 +54,8 @@ Screen('TextSize', w, 50); % set text size
 % set up keyboard configurations
 KbQueueCreate(); % create keyboard listening queue
 KbName('UnifyKeyNames'); % unifies key names across operating systems
-BREAKKEY = KbName({'F5'}); % to break out of the program prematurely
-BLOCKSKIPKEY = KbName({'F6'}); % skip a block by going to the n-1th trial of that block
+BREAKKEY = KbName({'q'}); % to break out of the program prematurely
+BLOCKSKIPKEY = KbName({'s'}); % skip a block by going to the n-1th trial of that block
 SPACEKEY = KbName({'SPACE'}); % general selection key
 SKIPKEY = KbName(96);
 KbQueueStart(); % start the listening queue
@@ -147,7 +147,7 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
     trialAccuracy = zeros(NTRIALS,1); % the go/no-go accuracy for each trial
     trialTiming = zeros(NTRIALS,1); % records the length of time for a trial
 
-    % set the trial parameters for the particular block being rnu
+    % set the trial parameters for the particular block being run
     for i = 1:NTRIALS
         trialBlankTime(i) = BLANK_TIME + (randi([0,4]) * (BLANK_BUFFER/4)); % the jitter for the blank time
         trialTrigger(i) = finalOrder(i, blockNumber); % the trigger sent for the type of stimulus being shown (100 = oddball)
@@ -163,7 +163,7 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
                 '\n\nYou will see sequences of faces appearing on the screen, your task is to ',...
                 '\npress the space bar when you see a face appear twice in a row.',...
                 '\n\nPress the space bar to continue.'], 'center', 200, WHITE, 80, [], [], 1.5); % instructions to start experiment
-        elseif instructionScreen == 3 % second instructino screen
+        elseif instructionScreen == 3 % second instruction screen
             DrawFormattedText(w, ['This is the training block.',...
                 '\n\nYou will see sequences of faces appearing on the screen, your task is to ',...
                 '\npress the space bar when you see a face appear twice in a row.',...
