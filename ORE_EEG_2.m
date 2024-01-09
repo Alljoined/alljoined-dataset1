@@ -15,13 +15,13 @@ answer = inputdlg({'Subject #', 'Session number'}, 'Parameters', 1, {num2str(SUB
 SESSION_NUMBER = str2double(SESSION_NUMBER); % current run number
 
 % stimulus parameters 
-FACE_WIDTH = 150; % the width of the face 
-FACE_HEIGHT = 196; % scaling the height of the face 
-NFACES = 60;
+IMG_WIDTH = 224; % the width of the image 
+IMG_HEIGHT = 224; % scaling the height of the image 
+NIMAGES = 100;
  
 % setup trial and block parameters 
 DISPLAY_TIME = 0.3; % the time the stimulus is displayed on screen 
-BLANK_TIME = 0.6; % the minimum blank time 
+BLANK_TIME = 0.3; % the minimum blank time 
 BLANK_BUFFER = 0.1; % the temporal jitter that may be added to the blank time
 CUE_TIME = 0.1; % the time the cue is presented on screen
 
@@ -60,14 +60,14 @@ SPACEKEY = KbName({'SPACE'}); % general selection key
 SKIPKEY = KbName(96);
 KbQueueStart(); % start the listening queue
 
-% this section sets up coordinate positions for ensembles and single faces
+% this section sets up coordinate positions for ensembles and single images_
 disp ('Ordering trials'); % display loading to console
 
 NODDBALLS = 24; % number of oddball trials
-facePairs = [repmat(1:NFACES, 1,4)'; zeros(NODDBALLS,1)+100]; % each block has all faces repeated four times and 24 oddballs
+facePairs = [repmat(1:NIMAGES, 1,4)'; zeros(NODDBALLS,1)+100]; % each block has all faces repeated four times and 24 oddballs
 NTRIALS = length(facePairs); % total number of trials including oddballs
 NUM_BLOCKS = 17; % total number of blocks per session (1 training and 16 testing)
-COORDS = [xMid-(FACE_WIDTH/2), yMid-(FACE_HEIGHT/2), xMid+(FACE_WIDTH/2), yMid+(FACE_WIDTH/2)];
+COORDS = [xMid-(IMG_WIDTH/2), yMid-(IMG_HEIGHT/2), xMid+(IMG_WIDTH/2), yMid+(IMG_WIDTH/2)];
 
 for k = 1:NUM_BLOCKS
     % this section sorts all the trials, ensuring the same face is never repeated twice
@@ -84,7 +84,7 @@ for k = 1:NUM_BLOCKS
         end % if checking for errors
         
         if indexAt < 3 % for the first two trials, cannot choose a oddball trial
-            getIndex = randi([1,NFACES*4]); 
+            getIndex = randi([1,NIMAGES*4]); 
         else
             getIndex = randi([1,NTRIALS]); % select a random index (inclusive of oddball trials)
         end
@@ -110,10 +110,16 @@ for k = 1:NUM_BLOCKS
     
     finalOrder(:,k) = shuffledFaces; 
 end
-load stim_file; %#ok<*LOAD>
- 
-for i = 1:length(stim_file) %#ok<USENS>
-    STIM_IMAGE{i} = Screen('MakeTexture', w, stim_file{i}); 
+%load stim_file; %#ok<*LOAD>
+
+%for i = 1:length(stim_file) %#ok<USENS>
+%    STIM_IMAGE{i} = Screen('MakeTexture', w, stim_file{i}); 
+%end
+
+load coco_file;
+
+for i = 1:length(coco_file)
+    STIM_IMAGE{i} = Screen('MakeTexture', w, coco_file{i}); 
 end
 
 % load (or generate) appropriate directories for the subjects 
@@ -394,8 +400,8 @@ runData.(['r' num2str(SESSION_NUMBER)]).blankTime = BLANK_TIME;
 runData.(['r' num2str(SESSION_NUMBER)]).blankBuffer = BLANK_BUFFER;
 runData.(['r' num2str(SESSION_NUMBER)]).cueTime = CUE_TIME;
 runData.(['r' num2str(SESSION_NUMBER)]).coords = COORDS;
-runData.(['r' num2str(SESSION_NUMBER)]).faceHeight = FACE_HEIGHT;
-runData.(['r' num2str(SESSION_NUMBER)]).faceWidth = FACE_WIDTH;
+runData.(['r' num2str(SESSION_NUMBER)]).faceHeight = IMG_HEIGHT;
+runData.(['r' num2str(SESSION_NUMBER)]).faceWidth = IMG_WIDTH;
 runData.(['r' num2str(SESSION_NUMBER)]).startRecordTrigger = START_RECORD;
 runData.(['r' num2str(SESSION_NUMBER)]).stopRecordTrigger = STOP_RECORD;
 runData.(['r' num2str(SESSION_NUMBER)]).correctHitTrigger = CORRECT_HIT;
