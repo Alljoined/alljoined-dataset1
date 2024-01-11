@@ -15,8 +15,10 @@ answer = inputdlg({'Subject #', 'Session number'}, 'Parameters', 1, {num2str(SUB
 SESSION_NUMBER = str2double(SESSION_NUMBER); % current run number
 
 % stimulus parameters 
-IMG_WIDTH = 224; % the width of the image 
-IMG_HEIGHT = 224; % scaling the height of the image 
+%IMG_WIDTH = 224; % the width of the image 
+%IMG_HEIGHT = 224; % scaling the height of the image 
+IMG_WIDTH = 425; % the width of the image 
+IMG_HEIGHT = 425; % scaling the height of the image
 NIMAGES = 100;
  
 % setup trial and block parameters 
@@ -119,7 +121,9 @@ end
 load coco_file;
 
 for i = 1:length(coco_file)
-    STIM_IMAGE{i} = Screen('MakeTexture', w, coco_file{i}); 
+    img = coco_file{i};
+    img = img(:,:,[3, 2, 1]);  % Convert from RGB to BGR
+    STIM_IMAGE{i} = Screen('MakeTexture', w, img); 
 end
 
 % load (or generate) appropriate directories for the subjects 
