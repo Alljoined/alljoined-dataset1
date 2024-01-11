@@ -5,29 +5,42 @@ import h5py
 import numpy as np
 from scipy.io import savemat, loadmat
 
-file_path = r"C:\Users\jonat\Documents\coding\matlab_preprocessing\datasets--pscotti--mindeyev2\snapshots\2996c8186484bce80304442676ffeb351d35a62d\coco_images_224_float16.hdf5"
-label_path = r"C:\Users\jonat\Documents\coding\matlab_preprocessing\stimulus\nsd_expdesign.mat"
+# file_path = r"C:\Users\jonat\Documents\coding\matlab_preprocessing\datasets--pscotti--mindeyev2\snapshots\2996c8186484bce80304442676ffeb351d35a62d\coco_images_224_float16.hdf5"
+# label_path = r"C:\Users\jonat\Documents\coding\matlab_preprocessing\stimulus\nsd_expdesign.mat"
+
+file_path = "/Users/tazik/Downloads/nsd_stimuli.hdf5"
+label_path = "/Users/tazik/Downloads/matlab_preprocessing-main (1)/matlab_preprocessing-main/stimulus/nsd_expdesign.mat"
 
 # Get image indexes
 mat_contents = loadmat(label_path)
 select_idx = mat_contents['sharedix'][0]
 
-# Load HDF5 file
+batch_size = 100  # Adjust this based on your memory constraints
+num_images = len(select_idx)
+num_batches = int(np.ceil(num_images / batch_size))
+
+#Load h5 file 
 with h5py.File(file_path, 'r') as file:
-    images = np.array(file['images'])
+    cell_array = np.empty((num_images, 1), dtype=object)
 
-# Prepare the data for saving in .MAT format
-# MATLAB prefers dictionaries
-subset = images[select_idx]
-subset = (subset * 255).astype(np.uint8)
-num_images = len(subset)
+    for batch in range(num_batches):
+        start = batch * batch_size
+        end = min(start + batch_size, num_images)
+        batch_indices = select_idx[start:end]
 
-cell_array = np.empty((num_images, 1), dtype=object)
+        # Load a batch of images
+        images = np.array(file['imgBrick'][batch_indices])
+        images = (images * 255).astype(np.uint8)
 
-# Insert each image into the cell array as a uint8 array.
-for i in range(num_images):
-    # Transpose the image from (3, 224, 224) to (224, 224, 3) and ensure it's uint8
-    cell_array[i, 0] = np.transpose(subset[i], (1, 2, 0))
+        for i, img in enumerate(images):
+            # Process each image and add it to the cell array
+            # img = np.transpose(img, (1, 2, 0))  # Transpose the image
+            # img = img[:, :, ::-1]  # Swap Red and Blue channels
+            cell_array[start + i, 0] = img
+
+        del images  # Free up memory
 
 # Save the cell array to a .mat file.
 savemat('coco_file.mat', {'coco_file': cell_array})
+
+
