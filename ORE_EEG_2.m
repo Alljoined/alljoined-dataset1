@@ -6,7 +6,7 @@ if nargin < 2
     SESSION_NUMBER = '1'; % default run number is 1
 end
 if nargin < 1 
-    SUBJ = '1'; % default subject number is 99
+    SUBJ = '1'; % default subject number is 99f
 end
 
 % obtain and clarify participant information
@@ -146,18 +146,20 @@ function stimImg = getImg(i)
     % Load the first 100 images only if they haven't been loaded yet
     if isempty(preloadedImages)
         preloadedImages = cell(100, 1);
-        for j = 1:100
-            subjectimIdx = nsdData.subjectim(str2double(SUBJ), shuffledFaces(i))
+        for j = 1:60
+            disp(j)
+            subjectimIdx = nsdData.subjectim(str2double(SUBJ), shuffledFaces(j));
             im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 subjectimIdx], [3 425 425 1]), [3, 2, 1]);
             preloadedImages{j} = im;
         end
     end
 
     % Check if the requested index is within the preloaded range
-    if i <= 100
+    if i <= 60
         im = preloadedImages{i};
     else
-        im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 i], [3 425 425 1]), [3, 2, 1]);
+        subjectimIdx = nsdData.subjectim(str2double(SUBJ), shuffledFaces(i));
+        im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 subjectimIdx], [3 425 425 1]), [3, 2, 1]);
     end
 
     stimImg = Screen('MakeTexture', w, im);
