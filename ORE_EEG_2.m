@@ -17,7 +17,7 @@ SESSION_NUMBER = str2double(SESSION_NUMBER); % current run number
 % stimulus parameters 
 IMG_WIDTH = 224; % the width of the image 
 IMG_HEIGHT = 224; % scaling the height of the image 
-NIMAGES = 1000;
+NIMAGES = 60;
  
 % setup trial and block parameters 
 DISPLAY_TIME = 0.3; % the time the stimulus is displayed on screen 
@@ -77,13 +77,16 @@ nsdData = load('stimulus/nsd_expdesign.mat');
 % Therefore, we should have an array of 424 elements of indices from nsdData.subjectim[10000*SUBJ + 1000*SESSION_NUMBER + 100*(block-1) +1:10000*SUBJ + 1000*SESSION_NUMBER + 100*block +1].
 % The outputted array should randomly order these indices, and no index should be repeated twice in a row. The first two indices can not be -1.
 NODDBALLS = 24; % number of oddball trials
-NUM_BLOCKS = 10; % total number of blocks per session
-IMGS_PER_BLOCK = 100;
+NUM_BLOCKS = 16; % total number of blocks per session
+IMGS_PER_BLOCK = 60;
 COORDS = [xMid-(IMG_WIDTH/2), yMid-(IMG_HEIGHT/2), xMid+(IMG_WIDTH/2), yMid+(IMG_WIDTH/2)];
 
 for k = 1:NUM_BLOCKS
-    start_idx = IMGS_PER_BLOCK*(k-1) + 1;
-    end_idx = IMGS_PER_BLOCK*k;
+    %start_idx = IMGS_PER_BLOCK*(k-1) + 1;
+    %end_idx = IMGS_PER_BLOCK*k;
+    start_idx = 1;
+    end_idx = IMGS_PER_BLOCK;
+
     facePairs = [repmat(start_idx:end_idx, 1,4)'; zeros(NODDBALLS,1)-1]; % each block has 100 images repeated four times and 24 oddballs = 424 images
     NTRIALS = length(facePairs); % total number of trials including oddballs (424)
 
@@ -130,7 +133,8 @@ for k = 1:NUM_BLOCKS
     if shuffledFaces(i) == -1
       shuffledIndices = [shuffledIndices; -1];
     else
-      shuffledIndices = [shuffledIndices; nsdData.subjectim(str2double(SUBJ), 1000 * (SESSION_NUMBER - 1) + shuffledFaces(i))];
+      % shuffledIndices = [shuffledIndices; nsdData.subjectim(str2double(SUBJ), 1000 * (SESSION_NUMBER - 1) + shuffledFaces(i))];
+      shuffledIndices = [shuffledIndices; nsdData.subjectim(str2double(SUBJ), shuffledFaces(i))];
     end
     end
     
