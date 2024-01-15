@@ -141,27 +141,37 @@ for k = 1:NUM_BLOCKS
     finalOrder(:,k) = shuffledIndices; 
 end
 
-function stimImg = getImg(i)
-    persistent preloadedImages;
+% load coco_file
 
-    % Load the first 100 images only if they haven't been loaded yet
-    if isempty(preloadedImages)
-        preloadedImages = cell(100, 1);
-        for j = 1:100
-            im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 j], [3 425 425 1]), [3, 2, 1]);
-            preloadedImages{j} = im;
-        end
-    end
+% function stimImg = getImg(i)
+%     persistent preloadedImages;
 
-    % Check if the requested index is within the preloaded range
-    if i <= 100
-        im = preloadedImages{i};
-    else
-        im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 i], [3 425 425 1]), [3, 2, 1]);
-    end
+%     % Load the first 100 images only if they haven't been loaded yet
+%     if isempty(preloadedImages)
+%         preloadedImages = cell(100, 1);
+%         for j = 1:100
+%             im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 j], [3 425 425 1]), [3, 2, 1]);
+%             preloadedImages{j} = im;
+%         end
+%     end
 
-    stimImg = Screen('MakeTexture', w, im);
+%     % Check if the requested index is within the preloaded range
+%     if i <= 100
+%         im = preloadedImages{i};
+%     else
+%         im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 i], [3 425 425 1]), [3, 2, 1]);
+%     end
+
+%     stimImg = Screen('MakeTexture', w, im);
+% end
+
+
+load coco_file;
+
+for i = 1:length(coco_file)
+    STIM_IMAGE{i} = Screen('MakeTexture', w, coco_file{i}); 
 end
+
 
 % load (or generate) appropriate directories for the subjects 
 if exist(['subj' SUBJ], 'dir') ~= 7 % if the subject directory doesn't exist yet
@@ -276,9 +286,9 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
             case 'display' % for the stimulus display phase 
                 
                 if trialTrigger(iTrial) == -1 % for oddbal trials, repeat the image from the previous trial
-                    Screen('DrawTexture', w, getImg(trialTrigger(iTrial-1)), [], COORDS);
+                    Screen('DrawTexture', w, STIM_IMAGE(trialTrigger(iTrial-1)), [], COORDS);
                 else % else, draw the image associated with that trial (called based off the trigger)
-                    Screen('DrawTexture', w, getImg(trialTrigger(iTrial)), [], COORDS);
+                    Screen('DrawTexture', w, STIM_IMAGE(trialTrigger(iTrial)), [], COORDS);
                 end
                 
                 if elapsedTime > DISPLAY_TIME % if the elapsed time is greater than the display time
