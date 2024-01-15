@@ -17,7 +17,7 @@ SESSION_NUMBER = str2double(SESSION_NUMBER); % current run number
 % stimulus parameters 
 IMG_WIDTH = 224; % the width of the image 
 IMG_HEIGHT = 224; % scaling the height of the image 
-NIMAGES = 100;
+NIMAGES = 60;
  
 % setup trial and block parameters 
 DISPLAY_TIME = 0.3; % the time the stimulus is displayed on screen 
@@ -46,6 +46,8 @@ clc; % clear command window
  
 % setup screen information
 Screen('Preference', 'SkipSyncTests', 1); %THIS SHOULD BE SET FROM 1 to 0
+% For local computer, disabling sync, delete later
+Screen('Preference', 'ConserveVRAM', 64);
 [w, wRect] = Screen('OpenWindow', max(Screen('Screens')), BLACK); % open a new screen in the max window
 Screen('TextFont', w, 'Arial'); % Set text font
 Screen('TextSize', w, 50); % set text size
@@ -54,8 +56,8 @@ Screen('TextSize', w, 50); % set text size
 % set up keyboard configurations
 KbQueueCreate(); % create keyboard listening queue
 KbName('UnifyKeyNames'); % unifies key names across operating systems
-BREAKKEY = KbName({'F5'}); % to break out of the program prematurely
-BLOCKSKIPKEY = KbName({'F6'}); % skip a block by going to the n-1th trial of that block
+BREAKKEY = KbName({'q'}); % to break out of the program prematurely
+BLOCKSKIPKEY = KbName({'s'}); % skip a block by going to the n-1th trial of that block
 SPACEKEY = KbName({'SPACE'}); % general selection key
 SKIPKEY = KbName(96);
 KbQueueStart(); % start the listening queue
@@ -63,13 +65,31 @@ KbQueueStart(); % start the listening queue
 % this section sets up coordinate positions for ensembles and single images_
 disp ('Ordering trials'); % display loading to console
 
+% Load the stimulus file
+nsdData = load('stimulus/nsd_expdesign.mat');
+
+% Essentially, we have 8 subjects and each subject has 10 sessions.
+% Within each session, we have 10 blocks in a session.
+% Each block contains 100 indices.
+% For example, if we are on trial 2, session 3, block 4, we want the indices in nsdData.subjectim[23401:23500]
+% We iterate over ten blocks and create an array that repeats an index 4 times.
+% We randomly add -1, 24 times within each array.
+% Therefore, we should have an array of 424 elements of indices from nsdData.subjectim[10000*SUBJ + 1000*SESSION_NUMBER + 100*(block-1) +1:10000*SUBJ + 1000*SESSION_NUMBER + 100*block +1].
+% The outputted array should randomly order these indices, and no index should be repeated twice in a row. The first two indices can not be -1.
 NODDBALLS = 24; % number of oddball trials
-facePairs = [repmat(1:NIMAGES, 1,4)'; zeros(NODDBALLS,1)+100]; % each block has all faces repeated four times and 24 oddballs
-NTRIALS = length(facePairs); % total number of trials including oddballs
-NUM_BLOCKS = 17; % total number of blocks per session (1 training and 16 testing)
+NUM_BLOCKS = 16; % total number of blocks per session
+IMGS_PER_BLOCK = 60;
 COORDS = [xMid-(IMG_WIDTH/2), yMid-(IMG_HEIGHT/2), xMid+(IMG_WIDTH/2), yMid+(IMG_WIDTH/2)];
 
 for k = 1:NUM_BLOCKS
+    %start_idx = IMGS_PER_BLOCK*(k-1) + 1;
+    %end_idx = IMGS_PER_BLOCK*k;
+    start_idx = 1;
+    end_idx = IMGS_PER_BLOCK;
+
+    facePairs = [repmat(start_idx:end_idx, 1,4)'; zeros(NODDBALLS,1)-1]; % each block has 60 images repeated four times and 16 oddballs = 256 images
+    NTRIALS = length(facePairs); % total number of trials including oddballs (264)
+
     % this section sorts all the trials, ensuring the same face is never repeated twice
     countErrors = 1001; % automatic reset the trial sorting variables
     indexChosen = zeros(NTRIALS,1); % keeps record of whether an index was chosen during the sort. Makes sure duplicate indices aren't chosen
@@ -84,7 +104,7 @@ for k = 1:NUM_BLOCKS
         end % if checking for errors
         
         if indexAt < 3 % for the first two trials, cannot choose a oddball trial
-            getIndex = randi([1,NIMAGES*4]); 
+            getIndex = randi([1,IMGS_PER_BLOCK*4]); 
         else
             getIndex = randi([1,NTRIALS]); % select a random index (inclusive of oddball trials)
         end
@@ -106,20 +126,26 @@ for k = 1:NUM_BLOCKS
         end % if which checks if the index has already been chosen before proceeding to sorting it
     end % infinite loop which ensures all trials are sorted before exiting
 
-    shuffledFaces = facePairs(trialSort, :);
+    shuffledFaces = facePairs(trialSort, :); % length of 424, array of indices between start_idx and end_idx, with 24 -1s
+
+    shuffledIndices = [];
+    for i = 1:length(shuffledFaces)
+    if shuffledFaces(i) == -1
+      shuffledIndices = [shuffledIndices; -1];
+    else
+      % shuffledIndices = [shuffledIndices; nsdData.subjectim(str2double(SUBJ), 1000 * (SESSION_NUMBER - 1) + shuffledFaces(i))];
+      shuffledIndices = [shuffledIndices; nsdData.subjectim(str2double(SUBJ), shuffledFaces(i))];
+    end
+    end
     
-    finalOrder(:,k) = shuffledFaces; 
+    finalOrder(:,k) = shuffledIndices; 
 end
-%load stim_file; %#ok<*LOAD>
 
-%for i = 1:length(stim_file) %#ok<USENS>
-%    STIM_IMAGE{i} = Screen('MakeTexture', w, stim_file{i}); 
-%end
+function stimImg = getImg(i)
+    % Read the image from the HDF5 file
+    im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 i], [3 425 425 1]), [3, 2, 1]);
 
-load coco_file;
-
-for i = 1:length(coco_file)
-    STIM_IMAGE{i} = Screen('MakeTexture', w, coco_file{i}); 
+    stimImg = Screen('MakeTexture', w, im);
 end
 
 % load (or generate) appropriate directories for the subjects 
@@ -147,10 +173,11 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
     trialAccuracy = zeros(NTRIALS,1); % the go/no-go accuracy for each trial
     trialTiming = zeros(NTRIALS,1); % records the length of time for a trial
 
-    % set the trial parameters for the particular block being rnu
+    % set the trial parameters for the particular block being run
     for i = 1:NTRIALS
         trialBlankTime(i) = BLANK_TIME + (randi([0,4]) * (BLANK_BUFFER/4)); % the jitter for the blank time
-        trialTrigger(i) = finalOrder(i, blockNumber); % the trigger sent for the type of stimulus being shown (100 = oddball)
+        % TODO: look into using double trigger
+        trialTrigger(i) = finalOrder(i, blockNumber); % the trigger sent for the type of stimulus being shown (-1 = oddball)
     end
     
     % this section opens a splash screen and shows catch stimuli. This only runs for the beginning of the first block
@@ -199,7 +226,7 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
     % this section runs the main experiment loop
     %triggerMonitor = recordTrigger(sessionID, START_RECORD, triggerMonitor); % send and record the start trigger
     WaitSecs(0.5);
-    %triggerMonitor = recordTrigger(sessionID, 200+blockNumber, triggerMonitor);
+    %triggerMonitor = recordTrigger(sessionID, -1+blockNumber, triggerMonitor);
     trialPhase = 'startBlank'; % start with a blank trial (not included in the other trials)
     iTrial = 0; % begin at trial 0 (the start blank)
     setupTrial = 0; % boolean toggle to setup a new trial 
@@ -216,8 +243,8 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
             
             trialPhase = 'display'; % declare the trial phase as the display phase
             
-            if trialTrigger(iTrial) == 100
-                %triggerMonitor = recordTrigger(sessionID, 100+trialTrigger(iTrial-1), triggerMonitor); % record the trial trigger
+            if trialTrigger(iTrial) == -1
+                %triggerMonitor = recordTrigger(sessionID, -1+trialTrigger(iTrial-1), triggerMonitor); % record the trial trigger
             else
                 %triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial), triggerMonitor); % record the trial trigger
             end
@@ -235,10 +262,10 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
                 end
             case 'display' % for the stimulus display phase 
                 
-                if trialTrigger(iTrial) == 100 % for oddbal trials, repeat the image from the previous trial
-                    Screen('DrawTexture', w, STIM_IMAGE{trialTrigger(iTrial-1)}, [], COORDS);
+                if trialTrigger(iTrial) == -1 % for oddbal trials, repeat the image from the previous trial
+                    Screen('DrawTexture', w, getImg(trialTrigger(iTrial-1)), [], COORDS);
                 else % else, draw the image associated with that trial (called based off the trigger)
-                    Screen('DrawTexture', w, STIM_IMAGE{trialTrigger(iTrial)}, [], COORDS);
+                    Screen('DrawTexture', w, getImg(trialTrigger(iTrial)), [], COORDS);
                 end
                 
                 if elapsedTime > DISPLAY_TIME % if the elapsed time is greater than the display time
@@ -250,7 +277,7 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
                 if elapsedTime > DISPLAY_TIME + trialBlankTime(iTrial) % if the elapsed time is greater than the display and declared blank period for the trial
                     trialPhase = 'cue'; % switch to the cue phase to remove iconic memory and cue the next trial
                     if iTrial > 0 && trialRT(iTrial) == 0 % if the current trial is not the start blank and no key input was recorded for the trial
-                        if trialTrigger(iTrial) == 100 % if it's an oddball trial, the accuracy is 0 because they should have pressed a key (miss)
+                        if trialTrigger(iTrial) == -1 % if it's an oddball trial, the accuracy is 0 because they should have pressed a key (miss)
                             trialAccuracy(iTrial) = 0;
                         else % for non-oddball trials, the accuray is 1 because they correctly abstained from a keypress (correct abstinence)
                             trialAccuracy(iTrial) = 1;
@@ -281,7 +308,7 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
             KbQueueFlush(); % flush the keyboard input
             trialRT(iTrial) = elapsedTime; % record the trial RT as the elapsed time (display onset)
             
-            if trialTrigger(iTrial) == 100 % if they hit an oddball, set the accuracy to 1 (correct hit)
+            if trialTrigger(iTrial) == -1 % if they hit an oddball, set the accuracy to 1 (correct hit)
                 trialAccuracy(iTrial) = 1;
             else % else, if they hit a regular trial thatisn't an oddball, set the accuracy to 0 (false alarm)
                 trialAccuracy(iTrial) = 0;
@@ -349,7 +376,7 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
     
     % in case a stop trigger was not recorded as the last trigger, make sure it is
     if triggerMonitor{size(triggerMonitor,1),1} ~= STOP_RECORD % check to make sure the last trigger of the block was a stop trigger (won't be the case if there was a user-initiated termination)
-        triggerMonitor = recordTrigger(sessionID, STOP_RECORD , triggerMonitor); % send stop trigger
+        % triggerMonitor = recordTrigger(sessionID, STOP_RECORD , triggerMonitor); % send stop trigger
     end
     
     % this section saves block data

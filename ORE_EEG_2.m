@@ -76,7 +76,7 @@ nsdData = load('stimulus/nsd_expdesign.mat');
 % We randomly add -1, 24 times within each array.
 % Therefore, we should have an array of 424 elements of indices from nsdData.subjectim[10000*SUBJ + 1000*SESSION_NUMBER + 100*(block-1) +1:10000*SUBJ + 1000*SESSION_NUMBER + 100*block +1].
 % The outputted array should randomly order these indices, and no index should be repeated twice in a row. The first two indices can not be -1.
-NODDBALLS = 24; % number of oddball trials
+NODDBALLS = 15; % number of oddball trials
 NUM_BLOCKS = 16; % total number of blocks per session
 IMGS_PER_BLOCK = 60;
 COORDS = [xMid-(IMG_WIDTH/2), yMid-(IMG_HEIGHT/2), xMid+(IMG_WIDTH/2), yMid+(IMG_WIDTH/2)];
@@ -87,8 +87,8 @@ for k = 1:NUM_BLOCKS
     start_idx = 1;
     end_idx = IMGS_PER_BLOCK;
 
-    facePairs = [repmat(start_idx:end_idx, 1,4)'; zeros(NODDBALLS,1)-1]; % each block has 100 images repeated four times and 24 oddballs = 424 images
-    NTRIALS = length(facePairs); % total number of trials including oddballs (424)
+    facePairs = [repmat(start_idx:end_idx, 1,4)'; zeros(NODDBALLS,1)-1]; % each block has 60 images repeated four times and 15 oddballs = 255 images
+    NTRIALS = length(facePairs); % total number of trials including oddballs (255)
 
     % this section sorts all the trials, ensuring the same face is never repeated twice
     countErrors = 1001; % automatic reset the trial sorting variables
