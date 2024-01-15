@@ -141,34 +141,34 @@ for k = 1:NUM_BLOCKS
     finalOrder(:,k) = shuffledIndices; 
 end
 
-% function stimImg = getImg(i)
-%     persistent preloadedImages;
+function stimImg = getImg(i)
+    persistent preloadedImages;
 
-%     % Load the first 100 images only if they haven't been loaded yet
-%     if isempty(preloadedImages)
-%         preloadedImages = cell(100, 1);
-%         for j = 1:100
-%             im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 j], [3 425 425 1]), [3, 2, 1]);
-%             preloadedImages{j} = im;
-%         end
-%     end
+    % Load the first 100 images only if they haven't been loaded yet
+    if isempty(preloadedImages)
+        preloadedImages = cell(100, 1);
+        for j = 1:100
+            im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 j], [3 425 425 1]), [3, 2, 1]);
+            preloadedImages{j} = im;
+        end
+    end
 
-%     % Check if the requested index is within the preloaded range
-%     if i <= 100
-%         im = preloadedImages{i};
-%     else
-%         im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 i], [3 425 425 1]), [3, 2, 1]);
-%     end
+    % Check if the requested index is within the preloaded range
+    if i <= 100
+        im = preloadedImages{i};
+    else
+        im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 i], [3 425 425 1]), [3, 2, 1]);
+    end
 
-%     stimImg = Screen('MakeTexture', w, im);
-% end
-
-
-load coco_file_2;
-
-for i = 1:length(coco_file)
-    STIM_IMAGE(i) = Screen('MakeTexture', w, coco_file(i)); 
+    stimImg = Screen('MakeTexture', w, im);
 end
+
+
+% load coco_file_2;
+
+% for i = 1:length(coco_file)
+%     STIM_IMAGE(i) = Screen('MakeTexture', w, coco_file(i)); 
+% end
 
 
 % load (or generate) appropriate directories for the subjects 
