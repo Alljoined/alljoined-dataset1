@@ -141,11 +141,22 @@ for k = 1:NUM_BLOCKS
     finalOrder(:,k) = shuffledIndices; 
 end
 
+persistent preloadedImages;
+
+% Load the first 100 images only if they haven't been loaded yet
+if isempty(preloadedImages)
+    preloadedImages = cell(100, 1);
+    for j = 1:100
+        im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 j], [3 425 425 1]), [3, 2, 1]);
+        preloadedImages{j} = im;
+    end
+end
+
 function stimImg = getImg(i)
     % Read the image from the HDF5 file
     im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 i], [3 425 425 1]), [3, 2, 1]);
 
-    stimImg = Screen('MakeTexture', w, im);
+    stimImg = Screen('MakeTexture', w, preloadedImages{i});
 end
 
 % load (or generate) appropriate directories for the subjects 
