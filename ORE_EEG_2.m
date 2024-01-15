@@ -15,8 +15,8 @@ answer = inputdlg({'Subject #', 'Session number'}, 'Parameters', 1, {num2str(SUB
 SESSION_NUMBER = str2double(SESSION_NUMBER); % current run number
 
 % stimulus parameters 
-IMG_WIDTH = 224; % the width of the image 
-IMG_HEIGHT = 224; % scaling the height of the image 
+IMG_WIDTH = 425; % the width of the image 
+IMG_HEIGHT = 425; % scaling the height of the image 
 NIMAGES = 60;
  
 % setup trial and block parameters 
