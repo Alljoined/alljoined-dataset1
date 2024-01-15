@@ -6,7 +6,7 @@ if nargin < 2
     SESSION_NUMBER = '1'; % default run number is 1
 end
 if nargin < 1 
-    SUBJ = '99'; % default subject number is 99
+    SUBJ = '1'; % default subject number is 99
 end
 
 % obtain and clarify participant information
@@ -15,8 +15,8 @@ answer = inputdlg({'Subject #', 'Session number'}, 'Parameters', 1, {num2str(SUB
 SESSION_NUMBER = str2double(SESSION_NUMBER); % current run number
 
 % stimulus parameters 
-IMG_WIDTH = 224; % the width of the image 
-IMG_HEIGHT = 224; % scaling the height of the image 
+IMG_WIDTH = 425; % the width of the image 
+IMG_HEIGHT = 425; % scaling the height of the image 
 NIMAGES = 60;
  
 % setup trial and block parameters 
@@ -87,7 +87,7 @@ for k = 1:NUM_BLOCKS
     start_idx = 1;
     end_idx = IMGS_PER_BLOCK;
 
-    facePairs = [repmat(start_idx:end_idx, 1,4)'; zeros(NODDBALLS,1)-1]; % each block has 60 images repeated four times and 16 oddballs = 256 images
+    facePairs = [repmat(start_idx:end_idx, 1,4)'; zeros(NODDBALLS,1)-1]; % each block has 60 images repeated four times and 24 oddballs = 264 images
     NTRIALS = length(facePairs); % total number of trials including oddballs (264)
 
     % this section sorts all the trials, ensuring the same face is never repeated twice
@@ -133,20 +133,43 @@ for k = 1:NUM_BLOCKS
     if shuffledFaces(i) == -1
       shuffledIndices = [shuffledIndices; -1];
     else
-      % shuffledIndices = [shuffledIndices; nsdData.subjectim(str2double(SUBJ), 1000 * (SESSION_NUMBER - 1) + shuffledFaces(i))];
-      shuffledIndices = [shuffledIndices; nsdData.subjectim(str2double(SUBJ), shuffledFaces(i))];
+    %   shuffledIndices = [shuffledIndices; nsdData.subjectim(str2double(SUBJ), shuffledFaces(i))];
+      shuffledIndices = [shuffledIndices; shuffledFaces(i)];
     end
     end
     
     finalOrder(:,k) = shuffledIndices; 
 end
 
-function stimImg = getImg(i)
-    % Read the image from the HDF5 file
-    im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 i], [3 425 425 1]), [3, 2, 1]);
+% function stimImg = getImg(i)
+%     persistent preloadedImages;
 
-    stimImg = Screen('MakeTexture', w, im);
+%     % Load the first 100 images only if they haven't been loaded yet
+%     if isempty(preloadedImages)
+%         preloadedImages = cell(100, 1);
+%         for j = 1:100
+%             im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 j], [3 425 425 1]), [3, 2, 1]);
+%             preloadedImages{j} = im;
+%         end
+%     end
+
+%     % Check if the requested index is within the preloaded range
+%     if i <= 100
+%         im = preloadedImages{i};
+%     else
+%         im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 i], [3 425 425 1]), [3, 2, 1]);
+%     end
+
+%     stimImg = Screen('MakeTexture', w, im);
+% end
+
+
+load coco_file_2;
+
+for i = 1:length(coco_file)
+    STIM_IMAGE(i) = Screen('MakeTexture', w, coco_file(i)); 
 end
+
 
 % load (or generate) appropriate directories for the subjects 
 if exist(['subj' SUBJ], 'dir') ~= 7 % if the subject directory doesn't exist yet
@@ -176,7 +199,6 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
     % set the trial parameters for the particular block being run
     for i = 1:NTRIALS
         trialBlankTime(i) = BLANK_TIME + (randi([0,4]) * (BLANK_BUFFER/4)); % the jitter for the blank time
-        % TODO: look into using double trigger
         trialTrigger(i) = finalOrder(i, blockNumber); % the trigger sent for the type of stimulus being shown (-1 = oddball)
     end
     
@@ -224,9 +246,9 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
     end % loop that displays the splash screen
     
     % this section runs the main experiment loop
-    %triggerMonitor = recordTrigger(sessionID, START_RECORD, triggerMonitor); % send and record the start trigger
+    % triggerMonitor = recordTrigger(sessionID, START_RECORD, triggerMonitor); % send and record the start trigger
     WaitSecs(0.5);
-    %triggerMonitor = recordTrigger(sessionID, -1+blockNumber, triggerMonitor);
+    %triggerMonitor = recordTrigger(sessionID, 200+blockNumber, triggerMonitor);
     trialPhase = 'startBlank'; % start with a blank trial (not included in the other trials)
     iTrial = 0; % begin at trial 0 (the start blank)
     setupTrial = 0; % boolean toggle to setup a new trial 
@@ -242,11 +264,10 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
             end
             
             trialPhase = 'display'; % declare the trial phase as the display phase
-            
             if trialTrigger(iTrial) == -1
-                %triggerMonitor = recordTrigger(sessionID, -1+trialTrigger(iTrial-1), triggerMonitor); % record the trial trigger
-            else
-                %triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial), triggerMonitor); % record the trial trigger
+                % triggerMonitor = recordTrigger(sessionID, 100+trialTrigger(iTrial-1), triggerMonitor); % record the trial trigger
+            else % for non-oddball trials, the accuray is 1 because they correctly abstained from a keypress (correct abstinence)
+                % triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial), triggerMonitor); % record the trial trigger
             end
             
             trialStartTime = GetSecs(); % record the trial start time 
@@ -263,9 +284,9 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
             case 'display' % for the stimulus display phase 
                 
                 if trialTrigger(iTrial) == -1 % for oddbal trials, repeat the image from the previous trial
-                    Screen('DrawTexture', w, getImg(trialTrigger(iTrial-1)), [], COORDS);
+                    Screen('DrawTexture', w, STIM_IMAGE(trialTrigger(iTrial-1)), [], COORDS);
                 else % else, draw the image associated with that trial (called based off the trigger)
-                    Screen('DrawTexture', w, getImg(trialTrigger(iTrial)), [], COORDS);
+                    Screen('DrawTexture', w, STIM_IMAGE(trialTrigger(iTrial)), [], COORDS);
                 end
                 
                 if elapsedTime > DISPLAY_TIME % if the elapsed time is greater than the display time
@@ -447,6 +468,7 @@ Screen('CloseAll'); % close any texture
 sca; % close everything 
 end % end main function 
 
+% Todo: add double trigger
 function monitor = recordTrigger(session, triggerNumber, monitor) % function to monitor and send triggers
 SendTrigger(session, triggerNumber); % send the trigger 
 monitor = [monitor; {triggerNumber, GetSecs(), NaN}]; % record the trigger 
