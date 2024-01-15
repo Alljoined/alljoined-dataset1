@@ -76,7 +76,7 @@ nsdData = load('stimulus/nsd_expdesign.mat');
 % We randomly add -1, 24 times within each array.
 % Therefore, we should have an array of 424 elements of indices from nsdData.subjectim[10000*SUBJ + 1000*SESSION_NUMBER + 100*(block-1) +1:10000*SUBJ + 1000*SESSION_NUMBER + 100*block +1].
 % The outputted array should randomly order these indices, and no index should be repeated twice in a row. The first two indices can not be -1.
-NODDBALLS = 15; % number of oddball trials
+NODDBALLS = 24; % number of oddball trials
 NUM_BLOCKS = 16; % total number of blocks per session
 IMGS_PER_BLOCK = 60;
 COORDS = [xMid-(IMG_WIDTH/2), yMid-(IMG_HEIGHT/2), xMid+(IMG_WIDTH/2), yMid+(IMG_WIDTH/2)];
@@ -87,8 +87,8 @@ for k = 1:NUM_BLOCKS
     start_idx = 1;
     end_idx = IMGS_PER_BLOCK;
 
-    facePairs = [repmat(start_idx:end_idx, 1,4)'; zeros(NODDBALLS,1)-1]; % each block has 60 images repeated four times and 15 oddballs = 255 images
-    NTRIALS = length(facePairs); % total number of trials including oddballs (255)
+    facePairs = [repmat(start_idx:end_idx, 1,4)'; zeros(NODDBALLS,1)-1]; % each block has 60 images repeated four times and 24 oddballs = 264 images
+    NTRIALS = length(facePairs); % total number of trials including oddballs (264)
 
     % this section sorts all the trials, ensuring the same face is never repeated twice
     countErrors = 1001; % automatic reset the trial sorting variables
@@ -223,9 +223,9 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
     end % loop that displays the splash screen
     
     % this section runs the main experiment loop
-    %triggerMonitor = recordTrigger(sessionID, START_RECORD, triggerMonitor); % send and record the start trigger
+    % triggerMonitor = recordTrigger(sessionID, START_RECORD, triggerMonitor); % send and record the start trigger
     WaitSecs(0.5);
-    %triggerMonitor = recordTrigger(sessionID, -1+blockNumber, triggerMonitor);
+    %triggerMonitor = recordTrigger(sessionID, 200+blockNumber, triggerMonitor);
     trialPhase = 'startBlank'; % start with a blank trial (not included in the other trials)
     iTrial = 0; % begin at trial 0 (the start blank)
     setupTrial = 0; % boolean toggle to setup a new trial 
@@ -243,9 +243,9 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
             trialPhase = 'display'; % declare the trial phase as the display phase
             
             if trialTrigger(iTrial) == -1
-                %triggerMonitor = recordTrigger(sessionID, -1+trialTrigger(iTrial-1), triggerMonitor); % record the trial trigger
-            else
-                %triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial), triggerMonitor); % record the trial trigger
+                % triggerMonitor = recordTrigger(sessionID, 100+trialTrigger(iTrial-1), triggerMonitor); % record the trial trigger
+            else % for non-oddball trials, the accuray is 1 because they correctly abstained from a keypress (correct abstinence)
+                % triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial), triggerMonitor); % record the trial trigger
             end
             
             trialStartTime = GetSecs(); % record the trial start time 
@@ -446,6 +446,7 @@ Screen('CloseAll'); % close any texture
 sca; % close everything 
 end % end main function 
 
+% Todo: add double trigger
 function monitor = recordTrigger(session, triggerNumber, monitor) % function to monitor and send triggers
 SendTrigger(session, triggerNumber); % send the trigger 
 monitor = [monitor; {triggerNumber, GetSecs(), NaN}]; % record the trigger 
