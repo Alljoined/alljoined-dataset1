@@ -6,7 +6,7 @@ if nargin < 2
     SESSION_NUMBER = '1'; % default run number is 1
 end
 if nargin < 1 
-    SUBJ = '99'; % default subject number is 99
+    SUBJ = '1'; % default subject number is 99
 end
 
 % obtain and clarify participant information
@@ -141,22 +141,26 @@ for k = 1:NUM_BLOCKS
     finalOrder(:,k) = shuffledIndices; 
 end
 
-persistent preloadedImages;
-
-% Load the first 100 images only if they haven't been loaded yet
-if isempty(preloadedImages)
-    preloadedImages = cell(100, 1);
-    for j = 1:100
-        im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 j], [3 425 425 1]), [3, 2, 1]);
-        preloadedImages{j} = im;
-    end
-end
-
 function stimImg = getImg(i)
-    % Read the image from the HDF5 file
-    im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 i], [3 425 425 1]), [3, 2, 1]);
+    persistent preloadedImages;
 
-    stimImg = Screen('MakeTexture', w, preloadedImages{i});
+    % Load the first 100 images only if they haven't been loaded yet
+    if isempty(preloadedImages)
+        preloadedImages = cell(100, 1);
+        for j = 1:100
+            im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 j], [3 425 425 1]), [3, 2, 1]);
+            preloadedImages{j} = im;
+        end
+    end
+
+    % Check if the requested index is within the preloaded range
+    if i <= 100
+        im = preloadedImages{i};
+    else
+        im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 i], [3 425 425 1]), [3, 2, 1]);
+    end
+
+    stimImg = Screen('MakeTexture', w, im);
 end
 
 % load (or generate) appropriate directories for the subjects 
@@ -252,7 +256,6 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
             end
             
             trialPhase = 'display'; % declare the trial phase as the display phase
-            
             if trialTrigger(iTrial) == -1
                 % triggerMonitor = recordTrigger(sessionID, 100+trialTrigger(iTrial-1), triggerMonitor); % record the trial trigger
             else % for non-oddball trials, the accuray is 1 because they correctly abstained from a keypress (correct abstinence)
