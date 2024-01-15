@@ -131,20 +131,17 @@ for k = 1:NUM_BLOCKS
     finalOrder(:,k) = shuffledFaces; 
 end
 
+
+% Load the first numPreloadedImages images only if they haven't been loaded yet
+preloadedImages = cell(numPreloadedImages, 1);
+numPreloadedImages = 60;
+for j = 1:numPreloadedImages
+    subjectimIdx = nsdData.subjectim(str2double(SUBJ), j);
+    im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 subjectimIdx], [3 425 425 1]), [3, 2, 1]);
+    preloadedImages{j} = im;
+end
+
 function stimImg = getImg(i)
-    persistent preloadedImages;
-    numPreloadedImages = 60;
-
-    % Load the first numPreloadedImages images only if they haven't been loaded yet
-    if isempty(preloadedImages)
-        preloadedImages = cell(numPreloadedImages, 1);
-        for j = 1:numPreloadedImages
-            subjectimIdx = nsdData.subjectim(str2double(SUBJ), j);
-            im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 subjectimIdx], [3 425 425 1]), [3, 2, 1]);
-            preloadedImages{j} = im;
-        end
-    end
-
     % Check if the requested index is within the preloaded range
     if i <= numPreloadedImages
         im = preloadedImages{i};
