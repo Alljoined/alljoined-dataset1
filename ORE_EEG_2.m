@@ -127,23 +127,13 @@ for k = 1:NUM_BLOCKS
     end % infinite loop which ensures all trials are sorted before exiting
 
     shuffledFaces = facePairs(trialSort, :); % length of 424, array of indices between start_idx and end_idx, with 24 -1s
-
-    shuffledIndices = [];
-    for i = 1:length(shuffledFaces)
-    if shuffledFaces(i) == -1
-      shuffledIndices = [shuffledIndices; -1];
-    else
-      shuffledIndices = [shuffledIndices; shuffledFaces(i)];
-    end
-    end
     
-    finalOrder(:,k) = shuffledIndices; 
+    finalOrder(:,k) = shuffledFaces; 
 end
 
 function stimImg = getImg(i)
     persistent preloadedImages;
     numPreloadedImages = 60;
-    disp(i)
 
     % Load the first numPreloadedImages images only if they haven't been loaded yet
     if isempty(preloadedImages)
