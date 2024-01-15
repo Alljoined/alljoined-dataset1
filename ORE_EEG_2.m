@@ -133,7 +133,6 @@ for k = 1:NUM_BLOCKS
     if shuffledFaces(i) == -1
       shuffledIndices = [shuffledIndices; -1];
     else
-    %   shuffledIndices = [shuffledIndices; nsdData.subjectim(str2double(SUBJ), shuffledFaces(i))];
       shuffledIndices = [shuffledIndices; shuffledFaces(i)];
     end
     end
@@ -148,7 +147,8 @@ function stimImg = getImg(i)
     if isempty(preloadedImages)
         preloadedImages = cell(100, 1);
         for j = 1:100
-            im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 j], [3 425 425 1]), [3, 2, 1]);
+            subjectimIdx = nsdData.subjectim(str2double(SUBJ), shuffledFaces(i))
+            im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 subjectimIdx], [3 425 425 1]), [3, 2, 1]);
             preloadedImages{j} = im;
         end
     end
