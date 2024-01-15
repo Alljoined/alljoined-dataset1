@@ -133,8 +133,8 @@ for k = 1:NUM_BLOCKS
     if shuffledFaces(i) == -1
       shuffledIndices = [shuffledIndices; -1];
     else
-      % shuffledIndices = [shuffledIndices; nsdData.subjectim(str2double(SUBJ), 1000 * (SESSION_NUMBER - 1) + shuffledFaces(i))];
-      shuffledIndices = [shuffledIndices; nsdData.subjectim(str2double(SUBJ), shuffledFaces(i))];
+    %   shuffledIndices = [shuffledIndices; nsdData.subjectim(str2double(SUBJ), shuffledFaces(i))];
+      shuffledIndices = [shuffledIndices; shuffledFaces(i)];
     end
     end
     
