@@ -286,9 +286,9 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
             case 'display' % for the stimulus display phase 
                 
                 if trialTrigger(iTrial) == -1 % for oddbal trials, repeat the image from the previous trial
-                    Screen('DrawTexture', w, STIM_IMAGE(trialTrigger(iTrial-1)), [], COORDS);
+                    Screen('DrawTexture', w, STIM_IMAGE{trialTrigger(iTrial-1)}, [], COORDS);
                 else % else, draw the image associated with that trial (called based off the trigger)
-                    Screen('DrawTexture', w, STIM_IMAGE(trialTrigger(iTrial)), [], COORDS);
+                    Screen('DrawTexture', w, STIM_IMAGE{trialTrigger(iTrial)}, [], COORDS);
                 end
                 
                 if elapsedTime > DISPLAY_TIME % if the elapsed time is greater than the display time
