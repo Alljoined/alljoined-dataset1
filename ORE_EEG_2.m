@@ -157,7 +157,7 @@ end
 load coco_file_2;
 
 for i = 1:length(coco_file)
-    STIM_IMAGE(i) = Screen('MakeTexture', w, coco_file(i)); 
+    STIM_IMAGE{i} = Screen('MakeTexture', w, coco_file{i}); 
 end
 
 
@@ -274,9 +274,9 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
             case 'display' % for the stimulus display phase 
                 
                 if trialTrigger(iTrial) == -1 % for oddbal trials, repeat the image from the previous trial
-                    Screen('DrawTexture', w, STIM_IMAGE(trialTrigger(iTrial-1)), [], COORDS);
+                    Screen('DrawTexture', w, STIM_IMAGE{trialTrigger(iTrial-1)}, [], COORDS);
                 else % else, draw the image associated with that trial (called based off the trigger)
-                    Screen('DrawTexture', w, STIM_IMAGE(trialTrigger(iTrial)), [], COORDS);
+                    Screen('DrawTexture', w, STIM_IMAGE{trialTrigger(iTrial)}, [], COORDS);
                     %% 
                 end
                 

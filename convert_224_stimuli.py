@@ -5,8 +5,8 @@ import h5py
 import numpy as np
 from scipy.io import savemat, loadmat
 
-file_path = r"C:\Users\jonat\Documents\coding\matlab_preprocessing\datasets--pscotti--mindeyev2\snapshots\2996c8186484bce80304442676ffeb351d35a62d\coco_images_224_float16.hdf5"
-label_path = r"C:\Users\jonat\Documents\coding\matlab_preprocessing\stimulus\nsd_expdesign.mat"
+file_path = r"C:\srv\matlab_preprocessing\stimulus\datasets--pscotti--mindeyev2\snapshots\9b356f8332f385c4256a3a342fff9be3df4ef275\coco_images_224_float16.hdf5"
+label_path = r"C:\srv\matlab_preprocessing\stimulus\nsd_expdesign.mat"
 
 # Get image indexes
 mat_contents = loadmat(label_path)
