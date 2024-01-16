@@ -78,16 +78,17 @@ nsdData = load('stimulus/nsd_expdesign.mat');
 % The outputted array should randomly order these indices, and no index should be repeated twice in a row. The first two indices can not be -1.
 NODDBALLS = 24; % number of oddball trials
 NUM_BLOCKS = 16; % total number of blocks per session
-IMGS_PER_BLOCK = 60;
+IMGS_PER_BLOCK = 120;
 COORDS = [xMid-(IMG_WIDTH/2), yMid-(IMG_HEIGHT/2), xMid+(IMG_WIDTH/2), yMid+(IMG_WIDTH/2)];
 
 for k = 1:NUM_BLOCKS
-    %start_idx = IMGS_PER_BLOCK*(k-1) + 1;
-    %end_idx = IMGS_PER_BLOCK*k;
-    start_idx = 1;
-    end_idx = IMGS_PER_BLOCK;
+    subsetIdx = mod(k, 8)
+    start_idx = IMGS_PER_BLOCK*(subsetIdx-1) + 1;
+    end_idx = IMGS_PER_BLOCK*subsetIdx;
+    % start_idx = 1;
+    % end_idx = IMGS_PER_BLOCK;
 
-    facePairs = [repmat(start_idx:end_idx, 1,4)'; zeros(NODDBALLS,1)-1]; % each block has 60 images repeated four times and 24 oddballs = 264 images
+    facePairs = [repmat(start_idx:end_idx, 1,2)'; zeros(NODDBALLS,1)-1]; % each block has 60 images repeated four times and 24 oddballs = 264 images
     NTRIALS = length(facePairs); % total number of trials including oddballs (264)
 
     % this section sorts all the trials, ensuring the same face is never repeated twice
@@ -255,8 +256,10 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
             
             trialPhase = 'display'; % declare the trial phase as the display phase
             if trialTrigger(iTrial) == -1
+                % triggerMonitor = recordTrigger(sessionID, 100+mod(blockNumber-1, 8), triggerMonitor); % record the trial trigger
                 % triggerMonitor = recordTrigger(sessionID, 100+trialTrigger(iTrial-1), triggerMonitor); % record the trial trigger
             else % for non-oddball trials, the accuray is 1 because they correctly abstained from a keypress (correct abstinence)
+                % triggerMonitor = recordTrigger(sessionID, mod(blockNumber-1, 8), triggerMonitor); % record the trial trigger
                 % triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial), triggerMonitor); % record the trial trigger
             end
             
