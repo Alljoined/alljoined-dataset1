@@ -6,7 +6,7 @@ if nargin < 2
     SESSION_NUMBER = '1'; % default run number is 1
 end
 if nargin < 1 
-    SUBJ = '1'; % default subject number is 99f
+    SUBJ = '99'; % default subject number is 99f
 end
 
 % obtain and clarify participant information
@@ -154,11 +154,11 @@ function stimImg = getImg(i)
 end
 
 
-% load coco_file_2;
+load coco_file_2;
 
-% for i = 1:length(coco_file)
-%     STIM_IMAGE{i} = Screen('MakeTexture', w, coco_file{i}); 
-% end
+for i = 1:length(coco_file)
+    STIM_IMAGE{i} = Screen('MakeTexture', w, coco_file{i}); 
+end
 
 
 % load (or generate) appropriate directories for the subjects 

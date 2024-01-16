@@ -7,13 +7,14 @@ with h5py.File('./stimulus/nsd_stimuli.hdf5', 'r') as source_hdf5:
     num_images = 100
 
     # Initialize an array to store the images
-    images = np.zeros((num_images, 425, 425, 3), dtype='uint8')
+    # images = np.zeros((num_images, 425, 425, 3), dtype='uint8')
+    images = []
 
     # Loop through and copy the first 1000 images from the source
     for i in range(num_images):
         print(f"Loading image {i+1}/{num_images}")
         # Read the ith image
-        image_data = source_hdf5['imgBrick'][..., i]
+        image_data = source_hdf5['/imgBrick'][i,...]
         print("Read Image Data")
 
         # Permute the dimensions to match MATLAB's format
@@ -23,7 +24,7 @@ with h5py.File('./stimulus/nsd_stimuli.hdf5', 'r') as source_hdf5:
         images.append(image_data)
 
 # Create a dictionary to store the data
-mat_data = {'coco_file': images}
+mat_data = {'coco_file': np.array(images)}
 
 # Save the data to a .mat file
 savemat('coco_file_2.mat', mat_data)

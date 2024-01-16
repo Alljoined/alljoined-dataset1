@@ -1,7 +1,6 @@
 datasets--pscotti--mindeyev2/
 coco_file.mat
-coco_file_2.mat
-coco_file_2.mat
+coco_file*.mat
 stim_file.mat
 subj*/
 stimulus/
