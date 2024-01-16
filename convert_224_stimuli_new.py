@@ -10,24 +10,27 @@ label_path = r"C:\srv\matlab_preprocessing\stimulus\nsd_expdesign.mat"
 
 # Get image indexes
 mat_contents = loadmat(label_path)
-select_idx = mat_contents['sharedix'][0]
+indices = mat_contents['sharedix'][0]
 
 # Load HDF5 file
-with h5py.File(file_path, 'r') as file:
-    images = np.array(file['images'])
+with h5py.File(file_path, 'r') as source_hdf5:
+    # Define the number of images to save
+    num_images = len(indices)
 
-# Prepare the data for saving in .MAT format
-# MATLAB prefers dictionaries
-subset = images[select_idx]
-subset = (subset * 255).astype(np.uint8)
-num_images = len(subset)
+    # Initialize an array to store the images
+    cell_array = np.empty((num_images, 1), dtype=object)
 
-cell_array = np.empty((num_images, 1), dtype=object)
+    # Loop through and copy the first num_images images from the source
+    for i in range(num_images):
+        print(f"Loading image {i+1}/{num_images}")
+        # Read the ith image in (224, 224, 3) dimension
+        image_data = source_hdf5['images'][indices[i], ...]
+        print(source_hdf5['images'].shape)
+        # print(image_data.shape)
 
-# Insert each image into the cell array as a uint8 array.
-for i in range(num_images):
-    # Transpose the image from (3, 224, 224) to (224, 224, 3) and ensure it's uint8
-    cell_array[i, 0] = np.transpose(subset[i], (1, 2, 0))
+        # Add to image to our cell array
+        cell_array[i, 0] = image_data
+
 
 # Save the cell array to a .mat file.
 savemat('coco_file.mat', {'coco_file': cell_array})
