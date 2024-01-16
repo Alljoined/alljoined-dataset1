@@ -45,7 +45,7 @@ with h5py.File(file_path, 'r') as source_hdf5:
 mat_data = {'coco_file': cell_array}
 
 # Save the data to a .mat file
-name = f"coco_file_224_sub{args.subject}.mat" if args.subject else "coco_file_224.mat"
+name = f"coco_file_224_sub{args.subject}.mat" if args.subject else "coco_file_224_shared.mat"
 savemat(name, mat_data)
 
 print(f"Data saved to {name}.mat")
