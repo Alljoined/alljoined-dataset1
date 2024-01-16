@@ -82,9 +82,9 @@ IMGS_PER_BLOCK = 120;
 COORDS = [xMid-(IMG_WIDTH/2), yMid-(IMG_HEIGHT/2), xMid+(IMG_WIDTH/2), yMid+(IMG_WIDTH/2)];
 
 for k = 1:NUM_BLOCKS
-    subsetIdx = mod(k, 8);
-    start_idx = IMGS_PER_BLOCK*(subsetIdx-1) + 1;
-    end_idx = IMGS_PER_BLOCK*subsetIdx;
+    subsetIdx = mod(k-1, 8);
+    start_idx = IMGS_PER_BLOCK*subsetIdx + 1;
+    end_idx = IMGS_PER_BLOCK*(subsetIdx+1);
     % start_idx = 1;
     % end_idx = IMGS_PER_BLOCK;
 
