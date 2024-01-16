@@ -257,10 +257,10 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
             trialPhase = 'display'; % declare the trial phase as the display phase
             if trialTrigger(iTrial) == -1
                 % triggerMonitor = recordTrigger(sessionID, 100+blockNumber, triggerMonitor); % record the trial trigger
-                triggerMonitor = recordTrigger(sessionID, 100+trialTrigger(iTrial-1) - IMGS_PER_BLOCK*mod(blockNumber-1), 8), triggerMonitor); % record the trial trigger
+                % triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial-1) - IMGS_PER_BLOCK*mod(blockNumber-1), 8), triggerMonitor); % record the trial trigger
             else % for non-oddball trials, the accuray is 1 because they correctly abstained from a keypress (correct abstinence)
                 % triggerMonitor = recordTrigger(sessionID, blockNumber, triggerMonitor); % record the trial trigger
-                triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial) - IMGS_PER_BLOCK*mod(blockNumber-1, 8), triggerMonitor); % record the trial trigger
+                % triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial) - IMGS_PER_BLOCK*mod(blockNumber-1, 8), triggerMonitor); % record the trial trigger
             end
             
             trialStartTime = GetSecs(); % record the trial start time 
