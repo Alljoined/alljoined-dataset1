@@ -4,13 +4,25 @@
 import h5py
 import numpy as np
 from scipy.io import savemat, loadmat
+import argparse
 
 file_path = r"C:\srv\matlab_preprocessing\stimulus\datasets--pscotti--mindeyev2\snapshots\9b356f8332f385c4256a3a342fff9be3df4ef275\coco_images_224_float16.hdf5"
 label_path = r"C:\srv\matlab_preprocessing\stimulus\nsd_expdesign.mat"
 
+parser = argparse.ArgumentParser(description="Subject # between 1 and 8.")
+# Add the argument
+parser.add_argument("-s", "--subject", type=int, choices=range(1, 9), 
+                    help="Subject # between 1 and 8")
+# Parse the arguments
+args = parser.parse_args()
+
 # Get image indexes
 mat_contents = loadmat(label_path)
-indices = mat_contents['sharedix'][0]
+indices = []
+if args.subject:
+    indices = mat_contents['subjectim'][args.subject-1]
+else:
+    indices = mat_contents['sharedix'][0]
 
 # Load HDF5 file
 with h5py.File(file_path, 'r') as source_hdf5:
@@ -33,6 +45,7 @@ with h5py.File(file_path, 'r') as source_hdf5:
 mat_data = {'coco_file': cell_array}
 
 # Save the data to a .mat file
-savemat('coco_file.mat', mat_data)
+name = f"coco_file_224_{args.subject}.mat" if args.subject else "coco_file_224.mat"
+savemat(name, mat_data)
 
 print("Data saved to coco_file.mat")
