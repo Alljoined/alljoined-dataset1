@@ -23,14 +23,11 @@ with h5py.File(file_path, 'r') as source_hdf5:
     # Loop through and copy the first num_images images from the source
     for i in range(num_images):
         print(f"Loading image {i+1}/{num_images}")
-        # Read the ith image in (224, 224, 3) dimension
+        # Read the ith image in (3, 224, 224) dimension
         image_data = source_hdf5['images'][indices[i], ...]
-        print(source_hdf5['images'].shape)
-        # print(image_data.shape)
 
-        # Add to image to our cell array
-        cell_array[i, 0] = image_data
-
+        # Add to image to our cell array and transpose to (224, 224, 3)
+        cell_array[i, 0] = np.transpose(image_data, (1, 2, 0))
 
 # Save the cell array to a .mat file.
 savemat('coco_file.mat', {'coco_file': cell_array})
