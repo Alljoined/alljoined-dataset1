@@ -14,7 +14,7 @@ with h5py.File('./stimulus/nsd_stimuli.hdf5', 'r') as source_hdf5:
     for i in range(num_images):
         print(f"Loading image {i+1}/{num_images}")
         # Read the ith image
-        image_data = source_hdf5['/imgBrick'][i,...]
+        image_data = source_hdf5['/imgBrick'][0:3, 0:425, 0:425, i]
         print("Read Image Data")
 
         # Permute the dimensions to match MATLAB's format
