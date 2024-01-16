@@ -154,7 +154,7 @@ end
 % end
 
 
-load coco_file;
+load coco_file_224_sub1;
 
 for i = 1:length(coco_file)
     STIM_IMAGE{i} = Screen('MakeTexture', w, coco_file{i}); 

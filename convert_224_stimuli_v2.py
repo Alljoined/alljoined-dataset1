@@ -36,7 +36,7 @@ with h5py.File(file_path, 'r') as source_hdf5:
     for i in range(num_images):
         print(f"Loading image {i+1}/{num_images}")
         # Read the ith image in (3, 224, 224) dimension
-        image_data = (source_hdf5['images'][indices[i], ...] * 255).astype(np.uint8)
+        image_data = (source_hdf5['images'][indices[i]-1, ...] * 255).astype(np.uint8)
 
         # Add to image to our cell array and transpose to (224, 224, 3)
         cell_array[i, 0] = np.transpose(image_data, (1, 2, 0))
@@ -45,7 +45,7 @@ with h5py.File(file_path, 'r') as source_hdf5:
 mat_data = {'coco_file': cell_array}
 
 # Save the data to a .mat file
-name = f"coco_file_224_{args.subject}.mat" if args.subject else "coco_file_224.mat"
+name = f"coco_file_224_sub{args.subject}.mat" if args.subject else "coco_file_224.mat"
 savemat(name, mat_data)
 
-print("Data saved to coco_file.mat")
+print(f"Data saved to {name}.mat")

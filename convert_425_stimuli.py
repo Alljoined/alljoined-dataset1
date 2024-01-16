@@ -22,6 +22,6 @@ with h5py.File('./stimulus/nsd_stimuli.hdf5', 'r') as source_hdf5:
 mat_data = {'coco_file': cell_array}
 
 # Save the data to a .mat file
-savemat('coco_file_2.mat', mat_data)
+savemat('coco_file_425.mat', mat_data)
 
-print("Data saved to coco_file_2.mat")
+print("Data saved to coco_file_425.mat")
