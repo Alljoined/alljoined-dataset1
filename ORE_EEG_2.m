@@ -82,7 +82,7 @@ IMGS_PER_BLOCK = 120;
 COORDS = [xMid-(IMG_WIDTH/2), yMid-(IMG_HEIGHT/2), xMid+(IMG_WIDTH/2), yMid+(IMG_WIDTH/2)];
 
 for k = 1:NUM_BLOCKS
-    subsetIdx = mod(k, 8)
+    subsetIdx = mod(k, 8);
     start_idx = IMGS_PER_BLOCK*(subsetIdx-1) + 1;
     end_idx = IMGS_PER_BLOCK*subsetIdx;
     % start_idx = 1;
@@ -105,7 +105,7 @@ for k = 1:NUM_BLOCKS
         end % if checking for errors
         
         if indexAt < 3 % for the first two trials, cannot choose a oddball trial
-            getIndex = randi([1,IMGS_PER_BLOCK*4]); 
+            getIndex = randi([1,IMGS_PER_BLOCK*2]); 
         else
             getIndex = randi([1,NTRIALS]); % select a random index (inclusive of oddball trials)
         end
