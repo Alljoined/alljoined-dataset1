@@ -157,7 +157,7 @@ end
 % load coco_file_2;
 
 % for i = 1:length(coco_file)
-%     STIM_IMAGE(i) = Screen('MakeTexture', w, coco_file(i)); 
+%     STIM_IMAGE{i} = Screen('MakeTexture', w, coco_file{i}); 
 % end
 
 
