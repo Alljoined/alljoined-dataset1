@@ -1,5 +1,6 @@
 function ORE_EEG_2(SUBJ, SESSION_NUMBER)
-
+global DEBUG_MODE;
+DEBUG_MODE = true;
 
 % load in default values if arguments are not set when running the function
 if nargin < 2
@@ -41,13 +42,19 @@ GREY = [128 128 128]; % generate gray colour palette
 BLACK = [0 0 0]; % generate black colour palette
 HideCursor; % remove cursor from the screen
 clc; % clear command window
-% sessionID = TriggerInit(SESSION_NUMBER); % comment this out
-%sessionID = TriggerInit(RUN_NUMBER); % retrieve session ID from trigger initiator
+if DEBUG_MODE
+    sessionID = SESSION_NUMBER;
+else
+    sessionID = TriggerInit(SESSION_NUMBER); % comment this out
+end
  
 % setup screen information
-Screen('Preference', 'SkipSyncTests', 1); %THIS SHOULD BE SET FROM 1 to 0
-% For local computer, disabling sync, delete later
-Screen('Preference', 'ConserveVRAM', 64);
+if DEBUG_MODE
+    Screen('Preference', 'SkipSyncTests', 1); %THIS SHOULD BE SET FROM 1 to 0
+    Screen('Preference', 'ConserveVRAM', 64);
+else
+    Screen('Preference', 'SkipSyncTests', 0); 
+end
 [w, wRect] = Screen('OpenWindow', max(Screen('Screens')), BLACK); % open a new screen in the max window
 Screen('TextFont', w, 'Arial'); % Set text font
 Screen('TextSize', w, 50); % set text size
@@ -237,9 +244,9 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
     end % loop that displays the splash screen
     
     % this section runs the main experiment loop
-    % triggerMonitor = recordTrigger(sessionID, START_RECORD, triggerMonitor); % send and record the start trigger
+    triggerMonitor = recordTrigger(sessionID, START_RECORD, triggerMonitor); % send and record the start trigger
     WaitSecs(0.5);
-    %triggerMonitor = recordTrigger(sessionID, 200+blockNumber, triggerMonitor);
+    triggerMonitor = recordTrigger(sessionID, 200+blockNumber, triggerMonitor);
     trialPhase = 'startBlank'; % start with a blank trial (not included in the other trials)
     iTrial = 0; % begin at trial 0 (the start blank)
     setupTrial = 0; % boolean toggle to setup a new trial 
@@ -256,11 +263,11 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
             
             trialPhase = 'display'; % declare the trial phase as the display phase
             if trialTrigger(iTrial) == -1
-                % triggerMonitor = recordTrigger(sessionID, 150+blockNumber, triggerMonitor); % record the trial trigger
-                % triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial-1) - IMGS_PER_BLOCK*mod(blockNumber-1), 8), triggerMonitor); % record the trial trigger
+                triggerMonitor = recordTrigger(sessionID, 150+blockNumber, triggerMonitor); % record the trial trigger
+                triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial-1) - IMGS_PER_BLOCK*mod(blockNumber-1, 8), triggerMonitor); % record the trial trigger
             else % for non-oddball trials, the accuray is 1 because they correctly abstained from a keypress (correct abstinence)
-                % triggerMonitor = recordTrigger(sessionID, blockNumber, triggerMonitor); % record the trial trigger
-                % triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial) - IMGS_PER_BLOCK*mod(blockNumber-1, 8), triggerMonitor); % record the trial trigger
+                triggerMonitor = recordTrigger(sessionID, blockNumber, triggerMonitor); % record the trial trigger
+                triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial) - IMGS_PER_BLOCK*mod(blockNumber-1, 8), triggerMonitor); % record the trial trigger
             end
             
             trialStartTime = GetSecs(); % record the trial start time 
@@ -298,7 +305,7 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
                             trialAccuracy(iTrial) = 1;
                         end
                         
-                        %triggerMonitor = recordTrigger(sessionID, (trialAccuracy(iTrial)*CORRECT_REJ)+(~trialAccuracy(iTrial)*MISS), triggerMonitor); % send the trigger as a function of the accuracy compared to miss or correct rejection
+                        triggerMonitor = recordTrigger(sessionID, (trialAccuracy(iTrial)*CORRECT_REJ)+(~trialAccuracy(iTrial)*MISS), triggerMonitor); % send the trigger as a function of the accuracy compared to miss or correct rejection
                     end                    
                 end 
             case 'cue' % cueing for the next trial
@@ -329,7 +336,7 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
                 trialAccuracy(iTrial) = 0;
             end
             
-            %triggerMonitor = recordTrigger(sessionID, (trialAccuracy(iTrial)*CORRECT_HIT)+(~trialAccuracy(iTrial)*FALSE_ALARM), triggerMonitor); % send the trigger as a function of accuracy compared to false alarm and correct hit
+            triggerMonitor = recordTrigger(sessionID, (trialAccuracy(iTrial)*CORRECT_HIT)+(~trialAccuracy(iTrial)*FALSE_ALARM), triggerMonitor); % send the trigger as a function of accuracy compared to false alarm and correct hit
         elseif keyCode(BREAKKEY) % if the user initiates termination of the script
             KbQueueFlush(); % flush the keyboard input 
             quit = 1; % set the quit toggle to active 
@@ -370,7 +377,7 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
             secsPassed = secsPassed + 1; % count up how many seconds have passed
             secStart = GetSecs(); % reset secsStart where elapsed time is calculated relative to
             if secsPassed == 5 % if five seconds have passed (where participants are now allowed to exit from the break)
-                %triggerMonitor = recordTrigger(sessionID, STOP_RECORD, triggerMonitor); % record the stop trigger 
+                triggerMonitor = recordTrigger(sessionID, STOP_RECORD, triggerMonitor); % record the stop trigger 
             end 
         end % if to check how much time has passed
          
@@ -391,7 +398,7 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
     
     % in case a stop trigger was not recorded as the last trigger, make sure it is
     if triggerMonitor{size(triggerMonitor,1),1} ~= STOP_RECORD % check to make sure the last trigger of the block was a stop trigger (won't be the case if there was a user-initiated termination)
-        % triggerMonitor = recordTrigger(sessionID, STOP_RECORD , triggerMonitor); % send stop trigger
+        triggerMonitor = recordTrigger(sessionID, STOP_RECORD , triggerMonitor); % send stop trigger
     end
     
     % this section saves block data
@@ -464,12 +471,19 @@ end % end main function
 
 % Todo: add double trigger
 function monitor = recordTrigger(session, triggerNumber, monitor) % function to monitor and send triggers
-SendTrigger(session, triggerNumber); % send the trigger 
-monitor = [monitor; {triggerNumber, GetSecs(), NaN}]; % record the trigger 
-disp (['Trigger ' num2str(triggerNumber)]); % display the trigger to the command window
+global DEBUG_MODE;
+if DEBUG_MODE
+    assert(triggerNumber > 0 && triggerNumber < 256, "Invalid trigger number");
+    monitor = [monitor; {triggerNumber, GetSecs(), NaN}];
+else
+    SendTrigger(session, triggerNumber); % send the trigger 
+    monitor = [monitor; {triggerNumber, GetSecs(), NaN}]; % record the trigger 
+    disp (['Trigger ' num2str(triggerNumber)]); % display the trigger to the command window
+    
+    monitorIndex = size(monitor,1); % get the size of the trigger monitor index 
+    if monitorIndex > 2 % if this is not the first logged trigger 
+        monitor{monitorIndex,3} = monitor{monitorIndex,2} - monitor{monitorIndex-1, 2}; % get the time difference between both triggers 
+    end 
 
-monitorIndex = size(monitor,1); % get the size of the trigger monitor index 
-if monitorIndex > 2 % if this is not the first logged trigger 
-    monitor{monitorIndex,3} = monitor{monitorIndex,2} - monitor{monitorIndex-1, 2}; % get the time difference between both triggers 
-end 
+end
 end % end record trigger function
