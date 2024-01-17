@@ -4,3 +4,4 @@ coco_file*.mat
 stim_file.mat
 subj*/
 stimulus/
+*.pth

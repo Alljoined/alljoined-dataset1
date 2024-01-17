@@ -1,0 +1,18 @@
+dataset is a list with length 11965
+dataset[0] is a dictionary with keys: ['eeg', 'image', 'label', 'subject']
+dataset[0][eeg] is a tensor with shape torch.Size([128, 500])
+dataset[0][image] is a <class 'int'>. Example: 0
+dataset[0][label] is a <class 'int'>. Example: 10
+dataset[0][subject] is a <class 'int'>. Example: 4
+labels is a list with length 40
+labels[0] is a <class 'str'>. Example: n02389026
+images is a list with length 1996
+images[0] is a <class 'str'>. Example: n02951358_31190
+
+
+
+# data['dataset'][0]['image'] is an index into data['images']
+# data['dataset'][0]['label'] is an index into data['labels']
+# Example: data['dataset'][0]['image'] = 0, data['dataset'][0]['label'] = 10
+# data['images'][0] is n02951358_31190
+# data['labels'][10] is n02951358
