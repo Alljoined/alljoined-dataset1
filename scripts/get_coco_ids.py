@@ -7,7 +7,7 @@ from scipy.io import savemat, loadmat
 import json
 import argparse
 
-label_path = r"C:\srv\matlab_preprocessing\stimulus\nsd_expdesign.mat"
+label_path = r"C:\srv\stimulus\stimulus\nsd_expdesign.mat"
 
 parser = argparse.ArgumentParser(description="Subject # between 1 and 8.")
 # Add the argument
@@ -25,4 +25,4 @@ else:
     indices = mat_contents['sharedix'][0]
 
 with open('data/coco_indices.json', 'w') as file:
-    json.dump(indices, file)
+    json.dump(indices.tolist(), file)
