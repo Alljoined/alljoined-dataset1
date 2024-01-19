@@ -1,5 +1,11 @@
 import random
 
+'''
+TODO: do we need to randomize
+TODO: 
+
+'''
+
 # Assuming the total length of your dataset
 total_length = 11965  # Replace with the actual length of your dataset
 
@@ -21,19 +27,19 @@ test_indices = indices[train_len + val_len:]
 
 # Create the splits list
 splits = []
-for _ in range(6):  # Repeat 6 times for 6 different splits
-    # Shuffle indices again for each split
-    random.shuffle(indices)
-    train_indices = indices[:train_len]
-    val_indices = indices[train_len:train_len + val_len]
-    test_indices = indices[train_len + val_len:]
 
-    split = {
-        'train': train_indices,
-        'val': val_indices,
-        'test': test_indices
-    }
-    splits.append(split)
+# Shuffle indices again for each split
+random.shuffle(indices)
+train_indices = indices[:train_len]
+val_indices = indices[train_len:train_len + val_len]
+test_indices = indices[train_len + val_len:]
+
+split = {
+    'train': train_indices,
+    'val': val_indices,
+    'test': test_indices
+}
+splits.append(split)
 
 # Example print to check one of the splits
 print(f"Train split length: {len(splits[0]['train'])}")
