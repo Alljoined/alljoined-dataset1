@@ -27,9 +27,9 @@ split = {
 }
 
 # Example print to check the split
-print(f"Train split length: {len(split['train'])}")
-print(f"Val split length: {len(split['val'])}")
-print(f"Test split length: {len(split['test'])}")
+# print(f"Train split length: {len(split['train'])}")
+# print(f"Val split length: {len(split['val'])}")
+# print(f"Test split length: {len(split['test'])}")
 
 # Export as .pth file
 torch.save(split, 'split.pth')
