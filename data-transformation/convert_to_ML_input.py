@@ -6,9 +6,9 @@ import re
 def process_mat_files(directory):
     result = {"dataset": [], "images": [0] * 960, "labels": [0] * 960}
     y = 0
-
+    files = sorted(os.listdir(directory))
     # Iterate through all .mat files in the directory
-    for file_name in sorted(os.listdir(directory)):
+    for file_name in files:
         if file_name.endswith('.mat'):
             # Extract image ID and subject ID from file name
             image_id, subject_id = extract_ids(file_name)
@@ -45,5 +45,5 @@ def extract_ids(file_name):
         return 0, 0  
 
 # Use the function
-processed_data = process_mat_files('/home/emma')
+processed_data = process_mat_files('./')
 print(processed_data)
