@@ -140,32 +140,11 @@ for k = 1:NUM_BLOCKS
 end
 
 
-% Load the first numPreloadedImages images only if they haven't been loaded yet
-% preloadedImages = cell(numPreloadedImages, 1);
-% numPreloadedImages = 60;
-% for j = 1:numPreloadedImages
-%     subjectimIdx = nsdData.subjectim(str2double(SUBJ), j);
-%     im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 subjectimIdx], [3 425 425 1]), [3, 2, 1]);
-%     preloadedImages{j} = im;
-% end
+filename = sprintf('coco_file_224_sub%s_ses_%s.mat', SUBJ, SESSION);
+loadedData= load(filename);
 
-% function stimImg = getImg(i)
-%     % Check if the requested index is within the preloaded range
-%     if i <= numPreloadedImages
-%         im = preloadedImages{i};
-%     else
-%         subjectimIdx = nsdData.subjectim(str2double(SUBJ), i);
-%         im = permute(h5read('../../stimulus/nsd_stimuli.hdf5', '/imgBrick', [1 1 1 subjectimIdx], [3 425 425 1]), [3, 2, 1]);
-%     end
-
-%     stimImg = Screen('MakeTexture', w, im);
-% end
-
-
-load coco_file_224_shared.mat;
-
-for i = 1:length(coco_file)
-    STIM_IMAGE{i} = Screen('MakeTexture', w, coco_file{i}); 
+for i = 1:length(loadedData.coco_file)
+    STIM_IMAGE{i} = Screen('MakeTexture', w, loadedData.coco_file{i}); 
 end
 
 
