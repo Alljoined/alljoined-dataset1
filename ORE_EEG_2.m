@@ -72,17 +72,11 @@ KbQueueStart(); % start the listening queue
 % this section sets up coordinate positions for ensembles and single images_
 disp ('Ordering trials'); % display loading to console
 
-% Load the stimulus file
-nsdData = load('stimulus/nsd_expdesign.mat');
-
 % Essentially, we have 8 subjects and each subject has 10 sessions.
-% Within each session, we have 10 blocks in a session.
-% Each block contains 100 indices.
-% For example, if we are on trial 2, session 3, block 4, we want the indices in nsdData.subjectim[23401:23500]
-% We iterate over ten blocks and create an array that repeats an index 4 times.
-% We randomly add -1, 24 times within each array.
-% Therefore, we should have an array of 424 elements of indices from nsdData.subjectim[10000*SUBJ + 1000*SESSION_NUMBER + 100*(block-1) +1:10000*SUBJ + 1000*SESSION_NUMBER + 100*block +1].
-% The outputted array should randomly order these indices, and no index should be repeated twice in a row. The first two indices can not be -1.
+% Within each session, we have 16 blocks in a session.
+% Each block contains 60 indices.
+% We iterate over 8 blocks and create an array that repeats an index twice. We repeat this twice for a total of 16 blocks and 4 repeats.
+% We randomly add 24 oddballs within each array.
 NODDBALLS = 24; % number of oddball trials
 NUM_BLOCKS = 16; % total number of blocks per session
 IMGS_PER_BLOCK = 120;
@@ -140,7 +134,7 @@ for k = 1:NUM_BLOCKS
 end
 
 
-filename = sprintf('coco_file_224_sub%s_ses_%s.mat', SUBJ, SESSION);
+filename = sprintf('processed_stimulus/coco_file_224_sub%s_ses_%s.mat', SUBJ, SESSION_NUMBER); 
 loadedData= load(filename);
 
 for i = 1:length(loadedData.coco_file)
