@@ -134,7 +134,7 @@ for k = 1:NUM_BLOCKS
 end
 
 
-filename = sprintf('processed_stimulus/coco_file_224_sub%s_ses_%s.mat', SUBJ, SESSION_NUMBER); 
+filename = sprintf('processed_stimulus/coco_file_224_sub%s_ses%s.mat', SUBJ, num2str(SESSION_NUMBER)); 
 loadedData= load(filename);
 
 for i = 1:length(loadedData.coco_file)
