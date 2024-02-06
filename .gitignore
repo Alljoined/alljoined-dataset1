@@ -1,4 +1,5 @@
 datasets--pscotti--mindeyev2/
+processed_stimulus/
 coco_file.mat
 coco_file*.mat
 stim_file.mat
