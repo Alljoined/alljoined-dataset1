@@ -6,3 +6,4 @@ stim_file.mat
 subj*/
 stimulus/
 *.pth
+data/annotations

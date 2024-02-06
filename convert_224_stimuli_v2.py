@@ -32,6 +32,8 @@ if args.subject:
 else:
     indices = mat_contents['sharedix'][0]
 
+print(indices)
+
 # Load HDF5 file
 with h5py.File(file_path, 'r') as source_hdf5:
     # Define the number of images to save
