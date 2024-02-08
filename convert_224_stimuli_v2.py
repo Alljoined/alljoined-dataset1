@@ -7,19 +7,20 @@ from scipy.io import savemat, loadmat
 import argparse
 import os
 
-file_path = r"C:\srv\stimulus\stimulus\datasets--pscotti--mindeyev2\snapshots\9b356f8332f385c4256a3a342fff9be3df4ef275\coco_images_224_float16.hdf5"
-label_path = r"C:\srv\stimulus\stimulus\nsd_expdesign.mat"
-save_path = "processed-stimulus"
-
-parser = argparse.ArgumentParser(description="Subject # between 1 and 8.")
-# Add the argument
-parser.add_argument("-s", "--subject", type=int, choices=range(1, 9), 
-                    help="Subject # between 1 and 8")
-parser.add_argument("--session", type=int, choices=range(1, 21), 
-                    help="Seesion # between 1 and 20")
-
-# Parse the arguments
-args = parser.parse_args()
+# file_path = r"C:\srv\stimulus\stimulus\datasets--pscotti--mindeyev2\snapshots\9b356f8332f385c4256a3a342fff9be3df4ef275\coco_images_224_float16.hdf5"
+# label_path = r"C:\srv\stimulus\stimulus\nsd_expdesign.mat"
+# save_path = "processed-stimulus"
+#
+# parser = argparse.ArgumentParser(description="Subject # between 1 and 8.")
+# # Add the argument
+# parser.add_argument("-s", "--subject", type=int, choices=range(1, 9), 
+#                     help="Subject # between 1 and 8")
+# parser.add_argument("--session", type=int, choices=range(1, 21), 
+#                     help="Seesion # between 1 and 20")
+#
+# # Parse the arguments
+# args = parser.parse_args()
+args = {}
 
 for sub in range(1, 9):
     for ses in range(1, 21):
