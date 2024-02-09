@@ -7,9 +7,9 @@ from scipy.io import savemat, loadmat
 import argparse
 import os
 
-# file_path = r"C:\srv\stimulus\stimulus\datasets--pscotti--mindeyev2\snapshots\9b356f8332f385c4256a3a342fff9be3df4ef275\coco_images_224_float16.hdf5"
-# label_path = r"C:\srv\stimulus\stimulus\nsd_expdesign.mat"
-# save_path = "processed-stimulus"
+file_path = r"C:\srv\stimulus\stimulus\datasets--pscotti--mindeyev2\snapshots\9b356f8332f385c4256a3a342fff9be3df4ef275\coco_images_224_float16.hdf5"
+label_path = r"C:\srv\stimulus\stimulus\nsd_expdesign.mat"
+save_path = "processed-stimulus"
 #
 # parser = argparse.ArgumentParser(description="Subject # between 1 and 8.")
 # # Add the argument
