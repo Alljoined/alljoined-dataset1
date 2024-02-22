@@ -7,3 +7,4 @@ subj*/
 stimulus/
 *.pth
 data/annotations
+pyrightconfig.json
