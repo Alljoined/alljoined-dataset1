@@ -36,7 +36,7 @@ for sub in range(1, 9):
         if args['subject']:
             indices = mat_contents['subjectim'][args['subject']-1]
             if args['session']:
-                split_start = 1000 * ((args['subject'] - 1) // 2)
+                split_start = 1000 * ((args['session'] - 1) // 2)
                 indices = indices[split_start:split_start+1000]
         else:
             indices = mat_contents['sharedix'][0]
