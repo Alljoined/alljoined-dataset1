@@ -65,14 +65,18 @@ with open('data/coco_indices.json', 'r') as file:
 
 csv_file_path = 'data/nsd_stim_info_merged.csv'
 data = []
+image_counter = 0 
 with open(csv_file_path, 'r') as file:
     for i, idx in enumerate(coco_idx):
+        if image_counter >= 960:  # Check if 960 images have been read
+            break  # Exit the loop if the limit is reached
         print(f"Reading index {idx}. Progress: {i+1}/{len(coco_idx)}")
         isFound = False
         for row in csv.DictReader(file):
             if row['nsdId'] == str(idx-1):
                 data.append({'nsdId': row['nsdId'], 'cocoId': row['cocoId'], 'cocoSplit': row['cocoSplit']})
                 isFound = True
+                image_counter += 1  # Increment the counter for each image read
                 break
         if not isFound:
             print(f"Index {idx} not found in csv file.")
