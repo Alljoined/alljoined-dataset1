@@ -442,7 +442,6 @@ Screen('CloseAll'); % close any texture
 sca; % close everything 
 end % end main function 
 
-% Todo: add double trigger
 function monitor = recordTrigger(session, triggerNumber, monitor) % function to monitor and send triggers
 global DEBUG_MODE;
 if DEBUG_MODE
