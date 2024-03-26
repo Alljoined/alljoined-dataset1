@@ -107,7 +107,7 @@ def run_experiment(trials, window, subj, session_number):
             last_image = image_path
         
         # Display the image
-        image_stim = visual.ImageStim(win=window, image=image_path, pos=(0, 0))
+        image_stim = visual.ImageStim(win=window, image=image_path, pos=(0, 0), size=(448, 448))
         image_stim.draw()
         window.flip()
         core.wait(0.3)  # Display time
@@ -151,7 +151,7 @@ def main():
         core.quit()
 
     # Setup window
-    window = visual.Window(fullscr=True, color=[0, 0, 0])
+    window = visual.Window(fullscr=True, color=[0, 0, 0], units='pix')
     window_size = window.size
 
     # Setup EEG
