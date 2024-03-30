@@ -20,8 +20,7 @@ with open('data/annotations/instances_val2017.json', 'r') as file:
     instances_val2017 = instances_val2017['annotations']
 
 
-# Function to find caption by image_id
-def find_caption(image_id, coco_split):
+def find_captions(image_id, coco_split):
     if coco_split == 'train2017':
         caption_list = captions_train2017
     elif coco_split == 'val2017':
@@ -29,10 +28,8 @@ def find_caption(image_id, coco_split):
     else:
         return None
 
-    for caption in caption_list:
-        if caption['image_id'] == int(image_id):
-            return caption['caption']
-    return None
+    captions = [caption['caption'] for caption in caption_list if caption['image_id'] == int(image_id)]
+    return captions
 
 
 # Function to find categories by image_id
@@ -50,11 +47,23 @@ def find_categories(image_id, coco_split):
     # Find annotations for the specified image
     image_annotations = [ann for ann in annotations if ann['image_id'] == int(image_id)]
 
+    # Use a set to store unique category IDs
+    unique_category_ids = set()
+
     # Extract category IDs and get category names and supercategories
-    categories = [{'category_id': ann['category_id'], 
-                   'category_name': next((cat['name'] for cat in categories_list if cat['id'] == ann['category_id']), None), 
-                   'supercategory_name': next((cat['supercategory'] for cat in categories_list if cat['id'] == ann['category_id']), None)} 
-                  for ann in image_annotations]
+    categories = []
+    for ann in image_annotations:
+        category_id = ann['category_id']
+        if category_id not in unique_category_ids:
+            unique_category_ids.add(category_id)
+            category = next((cat for cat in categories_list if cat['id'] == category_id), None)
+            if category:
+                category_info = {
+                    'category_id': category_id,
+                    'category_name': category['name'],
+                    'supercategory_name': category['supercategory']
+                }
+                categories.append(category_info)
 
     return categories
 
@@ -68,7 +77,7 @@ data = []
 image_counter = 0 
 with open(csv_file_path, 'r') as file:
     for i, idx in enumerate(coco_idx):
-        if image_counter >= 960:  # Check if 960 images have been read
+        if image_counter >= 2:  # Check if 960 images have been read
             break  # Exit the loop if the limit is reached
         print(f"Reading index {idx}. Progress: {i+1}/{len(coco_idx)}")
         isFound = False
@@ -84,7 +93,7 @@ with open(csv_file_path, 'r') as file:
 
 # Add captions and categories to the data
 for item in data:
-    item['caption'] = find_caption(item['cocoId'], item['cocoSplit'])
+    item['captions'] = find_captions(item['cocoId'], item['cocoSplit'])  # Changed to 'captions' and 'find_captions'
     categories = find_categories(item['cocoId'], item['cocoSplit'])
     if categories:
         item['categories'] = categories
@@ -92,5 +101,5 @@ for item in data:
         item['categories'] = None
 
 # Save the final data to a JSON file
-with open('data/captions_and_categories.json', 'w') as file:
+with open('data/captions_and_categories_test.json', 'w') as file:
     json.dump(data, file)
