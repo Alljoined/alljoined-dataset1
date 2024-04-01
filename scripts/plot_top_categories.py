@@ -39,26 +39,39 @@ sorted_supercategory_counts = dict(sorted(supercategory_counts.items(), key=lamb
 top_categories = sorted(category_counts.items(), key=lambda item: item[1], reverse=True)[:20]
 top_cat_names, top_cat_counts = zip(*top_categories)  # Unzipping the list of tuples
 
+# top_supercategories = sorted(supercategory_counts.items(), key=lambda item: item[1], reverse=True)[:3]
+# total_images = len(data)
+# print(total_images)
+# # Print the percentage of images with the top 3 supercategories
+# for supercat, count in top_supercategories:
+#     percentage = (count / total_images) * 100
+#     print(f"{supercat}: {percentage:.2f}% of images")
+
+# Set the font to Times New Roman for all text in the plots
+plt.rcParams['font.family'] = 'Times New Roman'
+
 # Plot for supercategories
-plt.figure(figsize=(10, 8))
+plt.figure(figsize=(12, 6))  # Make figure shorter and wider
 plt.bar(sorted_supercategory_counts.keys(), sorted_supercategory_counts.values())
-plt.title('Occurrences of Each Supercategory')
-plt.xlabel('Supercategory')
-plt.ylabel('Occurrences')
-plt.xticks(rotation=45, ha='right')
-plt.subplots_adjust(bottom=0.20)  # Adjust bottom margin to prevent cutting off labels
+plt.xlabel('Supercategory', fontsize=26)  # Increase font size for x-axis title
+plt.ylabel('Occurrences', fontsize=26)  # Increase font size for y-axis title
+plt.xticks(rotation=45, ha='right', fontsize=22)  # Increase font size for x-axis ticks
+plt.yticks(fontsize=14)  # Increase font size for y-axis ticks
+plt.tick_params(axis='both', which='major', labelsize=14)  # Increase the font size of the tick labels
+plt.subplots_adjust(bottom=0.25)  # Adjust bottom margin to prevent cutting off labels
 plt.tight_layout()
-plt.savefig('data/supercategories_histogram.png')  # Save the figure
+plt.savefig('data/supercategories_histogram_larger.png')  # Save the figure
 plt.show()
 
 # Plot for top 20 categories
-plt.figure(figsize=(12, 9))
-plt.bar(top_cat_names, top_cat_counts)
-plt.title('Top 20 Categories by Occurrence')
-plt.xlabel('Category')
-plt.ylabel('Occurrences')
-plt.xticks(rotation=45, ha='right')
-plt.subplots_adjust(bottom=0.20)  # Adjust bottom margin to prevent cutting off labels
-plt.tight_layout()
-plt.savefig('data/categories_histogram.png')  # Save the figure
-plt.show()
+# plt.figure(figsize=(10, 8))
+# plt.bar(top_cat_names, top_cat_counts)
+# plt.yscale('log')  # Set the y-axis to a logarithmic scale
+# plt.title('Top 20 Categories by Occurrence', fontsize=26, pad=20)  # Increase title font size and add padding
+# plt.xlabel('Category', fontsize=18)  # Increase font size for x-axis title
+# plt.ylabel('Occurrences (Log Scale)', fontsize=18)  # Increase font size for y-axis title
+# plt.xticks(rotation=45, ha='right')
+# plt.subplots_adjust(bottom=0.20)  # Adjust bottom margin to prevent cutting off labels
+# plt.tight_layout()
+# plt.savefig('data/categories_histogram.png')  # Save the figure
+# plt.show()
