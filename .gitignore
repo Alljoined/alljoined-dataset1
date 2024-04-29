@@ -8,3 +8,9 @@ stimulus/
 *.pth
 data/annotations
 pyrightconfig.json
+
+__pycache__/
+
+# authentication
+cert.pem
+.env

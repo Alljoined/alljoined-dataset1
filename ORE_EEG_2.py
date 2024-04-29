@@ -5,14 +5,101 @@ from scipy.io import loadmat
 from PIL import Image
 from tempfile import NamedTemporaryFile
 import random
+import asyncio
+import pathlib
+import websockets # pip install websocket-client
+import json
+import ssl
+import os
+from dotenv import load_dotenv # pip install python-dotenv
 
 # Placeholder function for EEG setup and trigger recording
+load_dotenv()
 
-
-def setup_eeg():
+async def setup_eeg():
+    async def send_message(message):
+        message_json = json.dumps(message)
+        await websocket.send(message_json)
+        response = await websocket.recv()
+        return json.loads(response)
     # Initialize EEG, e.g., with Emotiv SDK
     # This function needs to be implemented based on your EEG SDK's documentation
-    pass
+    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    localhost_pem = pathlib.Path(__file__).with_name("cert.pem")
+    ssl_context.load_verify_locations(localhost_pem)
+    async with websockets.connect("wss://localhost:6868", ssl=ssl_context) as websocket:
+        # by default emotiv uses port 6868, uses wss protocol
+        # first need to request access
+        await send_message({
+            "id": 1,
+            "jsonrpc": "2.0",
+            "method": "requestAccess",
+            "params": {
+                "clientId": os.environ.get('CLIENT_ID'),
+                "clientSecret": os.environ.get('CLIENT_SECRET'),
+            }
+        })
+        # give it access through launcher
+        # refresh the device list
+        await send_message({
+            "id": 1,
+            "jsonrpc": "2.0",
+            "method": "controlDevice",
+            "params": {
+                "command": "refresh"
+            }
+        })
+        # query the headsets
+        response = await send_message({
+            "id": 1,
+            "jsonrpc": "2.0",
+            "method": "queryHeadsets"
+        })
+        if len(response["result"]) == 0:
+            print("No headsets found")
+            return
+        # connect to the headset
+        headset = response["result"][0]["id"] # assuming the first headset, otherwise can manually specifiy
+        await send_message({
+            "id": 1,
+            "jsonrpc": "2.0",
+            "method": "controlDevice",
+            "params": {
+                "command": "connect",
+                "headset": headset,
+                "mappings": { # under the assumption that the headset is an EPOC Flex
+                    "CMS": "F3",
+                    "DRL": "F5",
+                    "LA": "AF3",
+                    "LB": "AF7",
+                    "RA": "P8"
+                }
+            }
+        })
+        response = await send_message({ # authorize the connection
+            "id": 1,
+            "jsonrpc": "2.0",
+            "method": "authorize",
+            "params": {
+                "clientId": os.environ.get('CLIENT_ID'),
+                "clientSecret": os.environ.get('CLIENT_SECRET'),
+            }
+        })
+        if "error" in response:
+            print(response["error"]) # if it gets here, probably didn't set up env variables correctly
+            return
+        cortex_token = response["result"]["cortexToken"]
+        send_message({
+            "id": 1,
+            "jsonrpc": "2.0",
+            "method": "createSession",
+            "params": {
+                "cortexToken": cortex_token,
+                "headset": headset,
+                "status": "open"
+            }
+        })
+
 
 
 def record_trigger(trigger_number, debug_mode=True):
@@ -174,6 +261,7 @@ def run_experiment(trials, window, subj, session_number, n_images, all_images):
 
         # Record a placeholder trigger
         record_trigger(99)
+        # record_trigger(trial['trial'])
 
         # Check if end of block
         if trial['end_of_block']:
@@ -224,7 +312,7 @@ def display_cross_with_jitter(window, base_time, jitter):
     core.wait(rest_period)
 
 
-def main():
+async def main():
     # Experiment setup
     participant_info = {'Subject': '', 'Session': '1'}
     dlg = gui.DlgFromDict(dictionary=participant_info, title='Experiment Info')
@@ -242,7 +330,7 @@ def main():
     display_instructions(window, participant_info['Session'])
 
     # Setup EEG
-    setup_eeg()
+    await setup_eeg()
 
     # Parameters
     n_images = 120  # Number of unique images
@@ -264,4 +352,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
