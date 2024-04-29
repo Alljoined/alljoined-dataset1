@@ -74,8 +74,13 @@ def load_images_from_mat(subj, session_number):
     loaded_data = loadmat(filename, simplify_cells=True)['coco_file']
     images = []
 
+    # Iterate through each item in the loaded image data.
     for i in range(len(loaded_data)):
+        # Access the image data. Given the structure noted, each 'img_data' should be directly
+        # an RGB image with the shape (224, 224, 3), meaning no additional reshaping or squeezing is needed.
         img_data = loaded_data[i]
+        # Ensure the image data is in the expected uint8 format for image processing.
+        # This step converts the MATLAB image data into a format suitable for creating an image file.
         img_array = np.uint8(img_data)
 
         # Create a temporary PNG file for the current image.
