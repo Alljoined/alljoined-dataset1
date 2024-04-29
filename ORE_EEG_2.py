@@ -79,7 +79,7 @@ def load_images_from_mat(subj, session_number):
             Image.fromarray(img_array).save(tmp.name)
             images.append(tmp.name)  # Save the path to the temporary file for later use.
 
-    print(f"\n\nTotal number of images loaded: {len(images)} \n\n")  # Print the total number of images
+    print(f"\nTotal number of images loaded: {len(images)} \n")  # Print the total number of images
     return images
 
 def load_and_shuffle_images(subj, session_number):
@@ -107,40 +107,24 @@ def select_block_images(all_images, block_number, n_images):
 
 
 def display_instructions(window, session_number):
-    instruction_text1 = (
-        f"Welcome to session {session_number} of the study.\n\n"
+    instruction_text = (
+        f"Welcome to block {session_number} of the study.\n\n"
         "In this session, you will complete a perception task.\n"
-        "This session consists of one training block and 16 experimental blocks.\n\n"
-        "You will see sequences of faces appearing on the screen, your task is to "
-        "press the space bar when you see a face appear twice in a row.\n\n"
-        "Press the space bar to continue."
-    )
-    instruction_text2 = (
-        "This is the training block.\n\n"
-        "You will see sequences of faces appearing on the screen, your task is to "
-        "press the space bar when you see a face appear twice in a row.\n\n"
+        "This session consists of 16 experimental blocks.\n\n"
+        "You will see sequences of images appearing on the screen, your task is to "
+        "press the space bar when you see an image appear twice in a row.\n\n"
         "When you are ready, press the space bar to start."
     )
 
     # Assuming a window width of 800 pixels, adjust this based on your actual window size
     wrap_width = window.size[0] * 0.8  # Use 80% of window width for text wrapping
 
-    message1 = visual.TextStim(window, text=instruction_text1, pos=(0, 0), color=(1, 1, 1), height=40, wrapWidth=wrap_width)
-    message1.draw()
+    message = visual.TextStim(window, text=instruction_text, pos=(0, 0), color=(1, 1, 1), height=40, wrapWidth=wrap_width)
+    message.draw()
     window.flip()
     event.waitKeys(keyList=['space'])
 
-    window.flip()
-    core.wait(0.5)
-
-    message2 = visual.TextStim(window, text=instruction_text2, pos=(0, 0), color=(1, 1, 1), height=40, wrapWidth=wrap_width)
-    message2.draw()
-    window.flip()
-    event.waitKeys(keyList=['space'])
-
-
-def run_experiment(trials, window, subj, session_number, n_images):
-    all_images = load_and_shuffle_images(subj, session_number)
+def run_experiment(trials, window, subj, session_number, n_images, all_images):
     last_image = None
     last_trial_number = None  # Track the last trial number to detect oddballs
 
@@ -182,12 +166,15 @@ def run_experiment(trials, window, subj, session_number, n_images):
         # Check if end of block
         if trial['end_of_block']:
             # Print the image sequence for the current block
-            print(f"End of Block {trial['block']} Image Sequence: \n {', '.join(map(str, image_sequence))}")
+            print(f"\nEnd of Block {trial['block']} Image Sequence: \n {', '.join(map(str, image_sequence))}")
             # Clear the list for the next block
             image_sequence = []
 
             # Display break message at the end of each block
             display_break_message(window, trial['block'])
+
+    # Display completion message
+    display_completion_message(window)
 
     # Cleanup: Remove temporary image files
     for img_path in all_images:
@@ -198,9 +185,16 @@ def run_experiment(trials, window, subj, session_number, n_images):
 
 
 def display_break_message(window, block_number):
-    message = f"You've completed block {block_number}. Take a little break and press the space bar when you're ready to continue to the next block."
+    message = f"You've completed block {block_number}.\n\nTake a little break and press the space bar when you're ready to continue to the next block."
     break_message = visual.TextStim(window, text=message, pos=(0, 0), color=(1, 1, 1), height=40, wrapWidth=window.size[0] * 0.8)
     break_message.draw()
+    window.flip()
+    event.waitKeys(keyList=['space'])
+
+def display_completion_message(window):
+    completion_text = "Congratulations! You have completed the experiment.\n\nPress the space bar to exit."
+    completion_message = visual.TextStim(window, text=completion_text, pos=(0, 0), color=(1, 1, 1), height=40, wrapWidth=window.size[0] * 0.8)
+    completion_message.draw()
     window.flip()
     event.waitKeys(keyList=['space'])
 
@@ -229,6 +223,9 @@ def main():
     # Setup window
     window = visual.Window(fullscr=True, color=[0, 0, 0], units='pix')
 
+    # Load and shuffle images before displaying instructions
+    all_images = load_and_shuffle_images(participant_info['Subject'], participant_info['Session'])
+
     # Display instructions
     display_instructions(window, participant_info['Session'])
 
@@ -245,7 +242,7 @@ def main():
     trials = create_trials(n_images, n_oddballs, num_blocks, img_width, img_height, window_size)
 
     # Run the experiment
-    run_experiment(trials, window, participant_info['Subject'], participant_info['Session'], n_images)
+    run_experiment(trials, window, participant_info['Subject'], participant_info['Session'], n_images, all_images)
 
     # Save results
     # This is where you would implement saving the collected data
