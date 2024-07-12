@@ -225,7 +225,11 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
     setupTrial = 0; % boolean toggle to setup a new trial 
     blockTime(blockNumber) = GetSecs(); % record the block time
     trialStartTime = blockTime; % record the trial start time to monitor the length of the trial
-    while ~quit % main experiment block loop: run as long as a quit isn't initiated
+
+    % main experiment block loop: run as long as a quit isn't initiated
+    % we display images with blank screens for 1 block
+    % note: this code is pretty inefficient, it constantly draws images and checks if the duration has passed some threshold to go to the next stage.
+    while ~quit 
         if setupTrial % if the setup trial toggle has been activated 
             setupTrial = 0; % turn off the toggle 
             iTrial = iTrial + 1; % count up number of passed trials 
@@ -235,12 +239,14 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
             end
             
             trialPhase = 'display'; % declare the trial phase as the display phase
+            % Send trigger to describe image ID
+            % Because trigger range is 0-255, we send two triggers. First is block number, second is image id.
             if trialTrigger(iTrial) == -1
-                triggerMonitor = recordTrigger(sessionID, 150+blockNumber, triggerMonitor); % record the trial trigger
-                triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial-1) - IMGS_PER_BLOCK*mod(blockNumber-1, 8), triggerMonitor); % record the trial trigger
-            else % for non-oddball trials, the accuray is 1 because they correctly abstained from a keypress (correct abstinence)
-                triggerMonitor = recordTrigger(sessionID, blockNumber, triggerMonitor); % record the trial trigger
-                triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial) - IMGS_PER_BLOCK*mod(blockNumber-1, 8), triggerMonitor); % record the trial trigger
+                triggerMonitor = recordTrigger(sessionID, 150+blockNumber, triggerMonitor); % add 150 to blocknumber to differentiate oddball
+                triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial-1) - IMGS_PER_BLOCK*mod(blockNumber-1, 8), triggerMonitor); 
+            else
+                triggerMonitor = recordTrigger(sessionID, blockNumber, triggerMonitor);
+                triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial) - IMGS_PER_BLOCK*mod(blockNumber-1, 8), triggerMonitor);
             end
             
             trialStartTime = GetSecs(); % record the trial start time 
@@ -255,7 +261,6 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
                     trialPhase = 'cue'; % switch to the cue for the first trial 
                 end
             case 'display' % for the stimulus display phase 
-                
                 if trialTrigger(iTrial) == -1 % for oddbal trials, repeat the image from the previous trial
                     Screen('DrawTexture', w, STIM_IMAGE{trialTrigger(iTrial-1)}, [], COORDS);
                 else % else, draw the image associated with that trial (called based off the trigger)
@@ -308,8 +313,8 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
             else % else, if they hit a regular trial thatisn't an oddball, set the accuracy to 0 (false alarm)
                 trialAccuracy(iTrial) = 0;
             end
-            
-            triggerMonitor = recordTrigger(sessionID, (trialAccuracy(iTrial)*CORRECT_HIT)+(~trialAccuracy(iTrial)*FALSE_ALARM), triggerMonitor); % send the trigger as a function of accuracy compared to false alarm and correct hit
+            % Send a behaviour trigger when participant presses button
+            triggerMonitor = recordTrigger(sessionID, (trialAccuracy(iTrial)*CORRECT_HIT)+(~trialAccuracy(iTrial)*FALSE_ALARM), triggerMonitor);
         elseif keyCode(BREAKKEY) % if the user initiates termination of the script
             KbQueueFlush(); % flush the keyboard input 
             quit = 1; % set the quit toggle to active 
