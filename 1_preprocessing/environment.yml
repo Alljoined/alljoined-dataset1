@@ -1,0 +1,17 @@
+name: preprocessing
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - datasets
+  - ca-certificates
+  - openssl
+  - python-dotenv
+  - pandas
+  - certifi
+  - pytables
+  - scipy
+  - mne-base
+  - ipykernel
+  - autoreject
+prefix: /home/jonathan/mambaforge/envs/preprocessing

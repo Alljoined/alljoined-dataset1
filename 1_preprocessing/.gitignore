@@ -1,0 +1,12 @@
+/eeg_data/*/*
+/tests/__pycache__
+.DS_Store
+venv
+/raw
+/final_dataset/nsd_coco_conversion.csv
+/final_dataset/data
+/final_dataset/stimulus/*
+/final_dataset/huggingface/*
+.env
+/raw_csv
+/parsed_csv
