@@ -49,8 +49,6 @@ ar = AutoReject(n_interpolates, consensus_percs, picks=picks, thresh_method='ran
 
 epochs = ar.fit_transform(epochs)
 
-epochs.average().plot()
-
 # Remove 'Status' channel (Step 8). 
 # Removing it here because you need this channel for earlier steps like creating epochs
 epochs.drop_channels(['Status'])
@@ -58,12 +56,8 @@ epochs.drop_channels(['Status'])
 # Rereferencing (Step 17)
 epochs.set_eeg_reference('average')
 
-# Baseline correction (Step 18)
-# Baseline correction before ICA is not recommended by the MNE-Python developers, as it doesn’t guarantee optimal results.
-epochs.apply_baseline(baseline=(-0.05, 0)) # look at time interval from 50ms from start to 0 seconds from start
-
 # Saving the preprocessed data
 root_name = os.path.splitext(args.input_file)[0][:-4]
-preprocessed_file_path = os.path.join(output_path, f"{root_name}_epo.fif" )
+preprocessed_file_path = os.path.join(output_path, f"{root_name}_epo_sanity.fif" )
 os.makedirs(os.path.dirname(preprocessed_file_path), exist_ok=True)
 epochs.save(preprocessed_file_path, overwrite=True)

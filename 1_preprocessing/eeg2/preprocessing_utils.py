@@ -39,12 +39,12 @@ def epoching(args, seed):
 		montage = mne.channels.make_standard_montage('standard_1020')
 		raw.set_montage(montage)
 
+		# Rereferencing electrodes
+		raw.set_eeg_reference('average', projection=False)
+
 		# Band pass filter
 		raw.filter(l_freq=args.lo_freq, h_freq=args.hi_freq)
 		raw.notch_filter(freqs=60)
-
-		import pdb
-		pdb.set_trace()
 
 		# Epoch into events and drop channels
 		events = mne.find_events(raw)
