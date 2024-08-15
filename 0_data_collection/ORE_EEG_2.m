@@ -261,11 +261,10 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
                     trialPhase = 'cue'; % switch to the cue for the first trial 
                 end
             case 'display' % for the stimulus display phase 
-                if trialTrigger(iTrial) == -1 % for oddbal trials, repeat the image from the previous trial
+                if trialTrigger(iTrial) == -1 % for oddball trials, repeat the image from the previous trial
                     Screen('DrawTexture', w, STIM_IMAGE{trialTrigger(iTrial-1)}, [], COORDS);
                 else % else, draw the image associated with that trial (called based off the trigger)
                     Screen('DrawTexture', w, STIM_IMAGE{trialTrigger(iTrial)}, [], COORDS);
-                    %% 
                 end
                 
                 if elapsedTime > DISPLAY_TIME % if the elapsed time is greater than the display time
@@ -279,7 +278,7 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
                     if iTrial > 0 && trialRT(iTrial) == 0 % if the current trial is not the start blank and no key input was recorded for the trial
                         if trialTrigger(iTrial) == -1 % if it's an oddball trial, the accuracy is 0 because they should have pressed a key (miss)
                             trialAccuracy(iTrial) = 0;
-                        else % for non-oddball trials, the accuray is 1 because they correctly abstained from a keypress (correct abstinence)
+                        else % for non-oddball trials, the accuracy is 1 because they correctly abstained from a keypress (correct abstinence)
                             trialAccuracy(iTrial) = 1;
                         end
                         
@@ -291,11 +290,13 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
                 
                 if iTrial > 0 % if the trial is not the start blank
                     if elapsedTime > DISPLAY_TIME + trialBlankTime(iTrial) + CUE_TIME % if the elapsed time is greater than the display, blank, and cue time
+                        % Ensure that we log the trigger just before setting up the next trial
+                        triggerMonitor = recordTrigger(sessionID, blockNumber, triggerMonitor);
                         setupTrial = 1; % toggle on the setup boolean to initiate the next trial
                         trialTiming(iTrial) = GetSecs() - trialStartTime; % record the time the trial took
                     end 
                 else % if the trial is the start blank 
-                    if elapsedTime > DISPLAY_TIME + BLANK_TIME + CUE_TIME % if theelapsed time is greater than the display time, blank (without buffer), and cue time
+                    if elapsedTime > DISPLAY_TIME + BLANK_TIME + CUE_TIME % if the elapsed time is greater than the display time, blank (without buffer), and cue time
                         setupTrial = 1; % toggle on the setup boolean to initiate the next trial 
                     end
                 end
