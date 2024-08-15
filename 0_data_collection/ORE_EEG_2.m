@@ -244,6 +244,7 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
             if trialTrigger(iTrial) == -1
                 triggerMonitor = recordTrigger(sessionID, 150+blockNumber, triggerMonitor); % add 150 to blocknumber to differentiate oddball
                 triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial-1) - IMGS_PER_BLOCK*mod(blockNumber-1, 8), triggerMonitor); 
+                % 1/2 - start trigger here  
             else
                 triggerMonitor = recordTrigger(sessionID, blockNumber, triggerMonitor);
                 triggerMonitor = recordTrigger(sessionID, trialTrigger(iTrial) - IMGS_PER_BLOCK*mod(blockNumber-1, 8), triggerMonitor);
@@ -262,6 +263,7 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
                 end
             case 'display' % for the stimulus display phase 
                 if trialTrigger(iTrial) == -1 % for oddball trials, repeat the image from the previous trial
+                    % 2/2 - we notice at this point there is that 100ms delay
                     Screen('DrawTexture', w, STIM_IMAGE{trialTrigger(iTrial-1)}, [], COORDS);
                 else % else, draw the image associated with that trial (called based off the trigger)
                     Screen('DrawTexture', w, STIM_IMAGE{trialTrigger(iTrial)}, [], COORDS);
@@ -290,8 +292,6 @@ for blockNumber = 1:NUM_BLOCKS % go through all the blocks in the run
                 
                 if iTrial > 0 % if the trial is not the start blank
                     if elapsedTime > DISPLAY_TIME + trialBlankTime(iTrial) + CUE_TIME % if the elapsed time is greater than the display, blank, and cue time
-                        % Ensure that we log the trigger just before setting up the next trial
-                        triggerMonitor = recordTrigger(sessionID, blockNumber, triggerMonitor);
                         setupTrial = 1; % toggle on the setup boolean to initiate the next trial
                         trialTiming(iTrial) = GetSecs() - trialStartTime; % record the time the trial took
                     end 
