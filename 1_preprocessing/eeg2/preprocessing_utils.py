@@ -42,14 +42,11 @@ def epoching(args, seed):
 		# Rereferencing electrodes
 		raw.set_eeg_reference('average', projection=False)
 
-		# Band pass filter
-		raw.filter(l_freq=args.lo_freq, h_freq=args.hi_freq)
-		raw.notch_filter(freqs=60)
-
 		# Epoch into events and drop channels
 		events = mne.find_events(raw)
-		epochs = mne.Epochs(raw, events, tmin=-0.05, tmax=0.60, baseline=(None,0), preload=True)
+		epochs = mne.Epochs(raw, events, tmin=0.05, tmax=0.70, baseline=(0.05,0.1), preload=True) # Manually move trigger back 100ms
 		epochs.drop_channels(['Status'])
+		epochs.shift_time(tshift=-0.1, relative=True)
 		ch_names = epochs.ch_names
 		times = epochs.times
 

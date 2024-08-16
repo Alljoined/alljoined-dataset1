@@ -15,8 +15,6 @@ parser.add_argument('--n_ses', default=1, type=int)
 parser.add_argument('--sfreq', default=512, type=int)
 parser.add_argument('--mvnn_dim', default='epochs', type=str)
 parser.add_argument('--project_dir', default='/srv/eeg_reconstruction/shared/biosemi-dataset', type=str)
-parser.add_argument('--lo_freq', default=0.1, type=float)
-parser.add_argument('--hi_freq', default=100, type=float)
 args = parser.parse_args()
 
 print('>>> EEG data preprocessing <<<')
